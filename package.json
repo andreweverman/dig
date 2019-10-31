@@ -1,0 +1,15 @@
+{
+  "name": "digjs",
+  "version": "1.0.0",
+  "description": "Additional spotify functionality",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andrew Everman",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "spotify-web-api-node": "^4.0.0"
+  }
+}
