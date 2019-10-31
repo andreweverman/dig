@@ -1,16 +1,92 @@
-// setup 
+// setup
+//  requires
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const SpotifyWebApi = require('spotify-web-api-node');
 const config = require('./bin/config.json');
+const sqlite3 = require('sqlite3').verbose();
 
+// const vars not requires
+const views = path.join(__dirname + '/views/');
+const db_path = "bin/digdb.db";
+
+
+// getting objects
 var spotifyApi = new SpotifyWebApi(config);
 var spotifyAccessCodes = {};
 var app = express();
+app.engine('html', require('ejs').renderFile);
+var db = getDB();
+
+
+function getDB() {
+    var db = null;
+    // TODO: have a function that looks for the db file. if not we will ahve some create lines and shiiii
+    // setting up the database
+
+    // need to check if the db file exists before connecting.
+    // if it doesnt then we will have to create the tables
+    db = new sqlite3.Database(db_path, (err) => {
+        if (err) {
+            console.log('Could not connect to database', err)
+        }
+    });
+
+
+    // db.all(`SELECT * FROM USER`,(err, rows ) => {
+    //     (!err) ? console.log(rows) : console.log("Need to create USER")
+    // });
+
+
+
+    // this will try to make the user table. wont error out if already there
+    db.run(`CREATE TABLE USER(
+        user_id text  PRIMARY KEY,
+        authorization_code text, 
+        access_token text,
+        refresh_token text)`, (err) => {
+        if (!err) {
+            console.log("Created USER table")
+        }
+    });
+
+    return db;
+}
+
+
+function userLoginDB(user_info) {
+    db.all(`SELECT * FROM USER WHERE user_id = ${user_info.user_id}`, (err, rows) => {
+        if (!err) {
+            // if user doesn't exist it gives us a [] back
+
+            if (rows = Array(0)) {
+                db.run(`INSERT INTO USER(user_id, authorization_code,access_token,refresh_token) VALUES(?)`, [user_info.user_id, user_info.authorization_code, user_info.access_token, user_info.refresh_token], (err) => {
+                    if (!err) {
+                        console.log("Created USER table")
+                    }
+                    else {
+                        console.log("ERROR: Adding user to DB")
+                    }
+                });
+
+
+            }
+            else {
+                console.log(rows)
+            }
+
+        } else {
+            console.log("ERROR: userLoginDB db.all statement")
+        }
+    });
+
+}
+
 
 // home route. show login page
 app.get('/', function (req, res) {
-    home_html = path.join(__dirname + '/views/home.html');
+    let home_html = path.join(__dirname + '/views/home.html');
     res.sendFile(home_html);
 });
 
@@ -31,21 +107,32 @@ app.get('/login', function (req, res) {
 app.get('/callback', function (req, res) {
     var authorizationCode = req.query.code;
 
+    let user_info = {};
+
     spotifyApi
         .authorizationCodeGrant(authorizationCode)
         .then(function (data) {
-            console.log('Retrieved access token', data.body['access_token']);
-       
-            // Set the access token
-            spotifyApi.setAccessToken(data.body['access_token']);
+            let access_token = data.body['access_token'];
+            let refresh_token = data.body['refresh_token'];
+            user_info.access_token = access_token;
+            user_info.refresh_token = refresh_token;
+            user_info.authorization_code = authorizationCode;
+            // Set the access tokens
+            spotifyApi.setAccessToken(access_token);
+            spotifyApi.setRefreshToken(refresh_token);
 
             // Use the access token to retrieve information about the user connected to it
             return spotifyApi.getMe();
         })
         .then(function (data) {
             // we want to save the access code that was given and the id of who it belongs to 
-            spotifyAccessCodes[data.body['uri'].split(":")[2]] = authorizationCode;
-            res.redirect("/user/" + data.body['uri'].split(":")[2]);
+            let user_id = data.body['uri'].split(":")[2]
+            user_info.user_id = user_id;
+
+            // this function will save/ update the user's credentials for use later
+            userLoginDB(user_info);
+
+            res.redirect("/user/" + user_id);
 
         })
         .catch(function (err) {
@@ -57,10 +144,13 @@ app.get('/callback', function (req, res) {
 
 // user home page
 app.get('/user/:userUri', function (req, res) {
-    var user_html = path.join(__dirname + '/views/user.html');    
-    res.sendFile(user_html);    
-    // res.write(JSON.stringify(req.params));
-    // res.send(spotifyApi.getMe().then);
+    let user_html = views + 'user.html.ejs';
+
+    let code = spotifyAccessCodes[req.params.userUri];
+
+
+
+    res.render(user_html, { username: "andreweverman" });
 
 });
 
