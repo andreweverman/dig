@@ -1,12 +1,10 @@
 var express = require('express'),
   session = require('express-session'),
   passport = require('passport'),
-  SpotifyStrategy = require('passport-spotify').Strategy;
+  SpotifyStrategy = require('passport-spotify').Strategy,
+  consolidate = require('consolidate');
 
-var consolidate = require('consolidate');
-
-var appKey = '***REMOVED***a';
-var appSecret = '***REMOVED***';
+const config = require('./bin/config.json');
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -29,11 +27,7 @@ passport.deserializeUser(function(obj, done) {
 //   and spotify profile), and invoke a callback with a user object.
 passport.use(
   new SpotifyStrategy(
-    {
-      clientID: appKey,
-      clientSecret: appSecret,
-      callbackURL: 'http://192.168.1.249:8080/callback'
-    },
+   config,
     function(accessToken, refreshToken, expires_in, profile, done) {
       // asynchronous verification, for effect...
       process.nextTick(function() {
