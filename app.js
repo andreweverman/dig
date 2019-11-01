@@ -1,161 +1,127 @@
-// setup
-//  requires
-const path = require('path');
-const fs = require('fs');
-const express = require('express');
-const SpotifyWebApi = require('spotify-web-api-node');
-const config = require('./bin/config.json');
-const sqlite3 = require('sqlite3').verbose();
+var express = require('express'),
+  session = require('express-session'),
+  passport = require('passport'),
+  SpotifyStrategy = require('passport-spotify').Strategy;
 
-// const vars not requires
-const views = path.join(__dirname + '/views/');
-const db_path = "bin/digdb.db";
+var consolidate = require('consolidate');
 
+var appKey = '44eba3f302eb48de8c029a30065d3aca';
+var appSecret = 'd2d4afcbbf86447bb44890aaedaef9e1';
 
-// getting objects
-var spotifyApi = new SpotifyWebApi(config);
-var spotifyAccessCodes = {};
+// Passport session setup.
+//   To support persistent login sessions, Passport needs to be able to
+//   serialize users into and deserialize users out of the session. Typically,
+//   this will be as simple as storing the user ID when serializing, and finding
+//   the user by ID when deserializing. However, since this example does not
+//   have a database of user records, the complete spotify profile is serialized
+//   and deserialized.
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+// Use the SpotifyStrategy within Passport.
+//   Strategies in Passport require a `verify` function, which accept
+//   credentials (in this case, an accessToken, refreshToken, expires_in
+//   and spotify profile), and invoke a callback with a user object.
+passport.use(
+  new SpotifyStrategy(
+    {
+      clientID: appKey,
+      clientSecret: appSecret,
+      callbackURL: 'http://192.168.1.249:8080/callback'
+    },
+    function(accessToken, refreshToken, expires_in, profile, done) {
+      // asynchronous verification, for effect...
+      process.nextTick(function() {
+        // To keep the example simple, the user's spotify profile is returned to
+        // represent the logged-in user. In a typical application, you would want
+        // to associate the spotify account with a user record in your database,
+        // and return that user instead.
+        
+        return done(null, profile);
+      });
+    }
+  )
+);
+
 var app = express();
-app.engine('html', require('ejs').renderFile);
-var db = getDB();
 
+// configure Express
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
 
-function getDB() {
-    var db = null;
-    // TODO: have a function that looks for the db file. if not we will ahve some create lines and shiiii
-    // setting up the database
+app.use(session({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+// Initialize Passport!  Also use passport.session() middleware, to support
+// persistent login sessions (recommended).
+app.use(passport.initialize());
+app.use(passport.session());
 
-    // need to check if the db file exists before connecting.
-    // if it doesnt then we will have to create the tables
-    db = new sqlite3.Database(db_path, (err) => {
-        if (err) {
-            console.log('Could not connect to database', err)
-        }
-    });
+app.use(express.static(__dirname + '/public'));
 
+app.engine('html', consolidate.swig);
 
-    // db.all(`SELECT * FROM USER`,(err, rows ) => {
-    //     (!err) ? console.log(rows) : console.log("Need to create USER")
-    // });
+app.get('/', function(req, res) {
+  res.render('index.html', { user: req.user });
+});
 
+app.get('/account', ensureAuthenticated, function(req, res) {
+  res.render('account.html', { user: req.user });
+});
 
+app.get('/login', function(req, res) {
+  res.render('login.html', { user: req.user });
+});
 
-    // this will try to make the user table. wont error out if already there
-    db.run(`CREATE TABLE USER(
-        user_id text  PRIMARY KEY,
-        authorization_code text, 
-        access_token text,
-        refresh_token text)`, (err) => {
-        if (!err) {
-            console.log("Created USER table")
-        }
-    });
+// GET /auth/spotify
+//   Use passport.authenticate() as route middleware to authenticate the
+//   request. The first step in spotify authentication will involve redirecting
+//   the user to spotify.com. After authorization, spotify will redirect the user
+//   back to this application at /auth/spotify/callback
+app.get(
+  '/auth/spotify',
+  passport.authenticate('spotify', {
+    scope: ['user-read-email', 'user-read-private','playlist-read-private'],
+    showDialog: true
+  }),
+  function(req, res) {
+    // The request will be redirected to spotify for authentication, so this
+    // function will not be called.
+  }
+);
 
-    return db;
+// GET /auth/spotify/callback
+//   Use passport.authenticate() as route middleware to authenticate the
+//   request. If authentication fails, the user will be redirected back to the
+//   login page. Otherwise, the primary route function function will be called,
+//   which, in this example, will redirect the user to the home page.
+app.get(
+  '/callback',
+  passport.authenticate('spotify', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  }
+);
+
+app.get('/logout', function(req, res) {
+  
+  req.logout();
+  res.redirect('/');
+});
+
+app.listen(8080);
+
+// Simple route middleware to ensure user is authenticated.
+//   Use this route middleware on any resource that needs to be protected.  If
+//   the request is authenticated (typically via a persistent login session),
+//   the request will proceed. Otherwise, the user will be redirected to the
+//   login page.
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');
 }
-
-
-function userLoginDB(user_info) {
-    db.all(`SELECT * FROM USER WHERE user_id = ${user_info.user_id}`, (err, rows) => {
-        if (!err) {
-            // if user doesn't exist it gives us a [] back
-
-            if (rows = Array(0)) {
-                db.run(`INSERT INTO USER(user_id, authorization_code,access_token,refresh_token) VALUES(?)`, [user_info.user_id, user_info.authorization_code, user_info.access_token, user_info.refresh_token], (err) => {
-                    if (!err) {
-                        console.log("Created USER table")
-                    }
-                    else {
-                        console.log("ERROR: Adding user to DB")
-                    }
-                });
-
-
-            }
-            else {
-                console.log(rows)
-            }
-
-        } else {
-            console.log("ERROR: userLoginDB db.all statement")
-        }
-    });
-
-}
-
-
-// home route. show login page
-app.get('/', function (req, res) {
-    let home_html = path.join(__dirname + '/views/home.html');
-    res.sendFile(home_html);
-});
-
-// doing the login. shoves them over to spotify
-app.get('/login', function (req, res) {
-    var scopes = 'playlist-modify-public playlist-modify-private playlist-modify-private user-library-read user-library-modify playlist-read-private';
-    var my_client_id = config.clientId;
-    var redirect_uri = config.redirectUri;
-    res.redirect('https://accounts.spotify.com/authorize' +
-        '?response_type=code' +
-        '&client_id=' + my_client_id +
-        (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-        '&redirect_uri=' + encodeURIComponent(redirect_uri));
-});
-
-
-// after spotify login, goes here. 
-app.get('/callback', function (req, res) {
-    var authorizationCode = req.query.code;
-
-    let user_info = {};
-
-    spotifyApi
-        .authorizationCodeGrant(authorizationCode)
-        .then(function (data) {
-            let access_token = data.body['access_token'];
-            let refresh_token = data.body['refresh_token'];
-            user_info.access_token = access_token;
-            user_info.refresh_token = refresh_token;
-            user_info.authorization_code = authorizationCode;
-            // Set the access tokens
-            spotifyApi.setAccessToken(access_token);
-            spotifyApi.setRefreshToken(refresh_token);
-
-            // Use the access token to retrieve information about the user connected to it
-            return spotifyApi.getMe();
-        })
-        .then(function (data) {
-            // we want to save the access code that was given and the id of who it belongs to 
-            let user_id = data.body['uri'].split(":")[2]
-            user_info.user_id = user_id;
-
-            // this function will save/ update the user's credentials for use later
-            userLoginDB(user_info);
-
-            res.redirect("/user/" + user_id);
-
-        })
-        .catch(function (err) {
-            console.log('Something went wrong', err.message);
-        });
-
-
-});
-
-// user home page
-app.get('/user/:userUri', function (req, res) {
-    let user_html = views + 'user.html.ejs';
-
-    let code = spotifyAccessCodes[req.params.userUri];
-
-
-
-    res.render(user_html, { username: "andreweverman" });
-
-});
-
-
-// localhost: 8080
-app.listen(8080, () => {
-    console.log("Running");
-});
