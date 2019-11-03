@@ -1,10 +1,12 @@
 var express = require('express'),
   session = require('express-session'),
   passport = require('passport'),
-  SpotifyStrategy = require('passport-spotify').Strategy,
-  consolidate = require('consolidate');
+  expressLayouts = require('express-ejs-layouts');
+  SpotifyStrategy = require('passport-spotify').Strategy;
 
+var consolidate = require('consolidate');
 const config = require('./bin/config.json');
+
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -27,7 +29,7 @@ passport.deserializeUser(function(obj, done) {
 //   and spotify profile), and invoke a callback with a user object.
 passport.use(
   new SpotifyStrategy(
-   config,
+    config,
     function(accessToken, refreshToken, expires_in, profile, done) {
       // asynchronous verification, for effect...
       process.nextTick(function() {
@@ -47,6 +49,7 @@ var app = express();
 // configure Express
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
+app.use(expressLayouts);
 
 app.use(session({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 // Initialize Passport!  Also use passport.session() middleware, to support
@@ -56,18 +59,17 @@ app.use(passport.session());
 
 app.use(express.static(__dirname + '/public'));
 
-app.engine('html', consolidate.swig);
 
 app.get('/', function(req, res) {
-  res.render('index.html', { user: req.user });
+  res.render('index.ejs', { user: req.user });
 });
 
 app.get('/account', ensureAuthenticated, function(req, res) {
-  res.render('account.html', { user: req.user });
+  res.render('account.ejs', { user: req.user });
 });
 
 app.get('/login', function(req, res) {
-  res.render('login.html', { user: req.user });
+  res.render('login.ejs', { user: req.user });
 });
 
 // GET /auth/spotify
