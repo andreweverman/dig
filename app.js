@@ -1,25 +1,34 @@
 var express = require('express'),
   session = require('express-session'),
   passport = require('passport'),
-  expressLayouts = require('express-ejs-layouts');
-  SpotifyStrategy = require('passport-spotify').Strategy;
+  expressLayouts = require('express-ejs-layouts'),
+  SpotifyStrategy = require('passport-spotify').Strategy,
+  mongoose = require('mongoose'),
+  findorcreate = require('mongoose-findorcreate'),
+  consolidate = require('consolidate');
 
-var consolidate = require('consolidate');
+
+
 const config = require('./bin/config.json');
 
+// mongoose setup
 
-// Passport session setup.
-//   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session. Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing. However, since this example does not
-//   have a database of user records, the complete spotify profile is serialized
-//   and deserialized.
-passport.serializeUser(function(user, done) {
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
+mongoose.connect(config.MONGO_URL);
+var db = mongoose.connection;
+var models = require('./dig_db')(mongoose);
+
+
+
+
+passport.serializeUser(function (user, done) {
   done(null, user);
 });
 
-passport.deserializeUser(function(obj, done) {
+passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
 
@@ -30,15 +39,28 @@ passport.deserializeUser(function(obj, done) {
 passport.use(
   new SpotifyStrategy(
     config,
-    function(accessToken, refreshToken, expires_in, profile, done) {
+    function (access_token, refresh_token, expires_in, profile, done) {
       // asynchronous verification, for effect...
-      process.nextTick(function() {
+      process.nextTick(function () {
         // To keep the example simple, the user's spotify profile is returned to
         // represent the logged-in user. In a typical application, you would want
         // to associate the spotify account with a user record in your database,
         // and return that user instead.
-        
-        return done(null, profile);
+
+        // gets the user based off id.
+        // 
+        models.User.findOrCreate({ user_id: profile.id }, function (err, user) {
+          user.access_token = access_token;
+          user.refresh_token = refresh_token;
+          user.save(err, user => {
+            if (err) return console.error(err);            
+           
+
+          });
+          return done(err, user);
+
+        });
+
       });
     }
   )
@@ -51,7 +73,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 
-app.use(session({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+app.use(session({ secret: 'aunt jemima', resave: true, saveUninitialized: true }));
 // Initialize Passport!  Also use passport.session() middleware, to support
 // persistent login sessions (recommended).
 app.use(passport.initialize());
@@ -60,17 +82,20 @@ app.use(passport.session());
 app.use(express.static(__dirname + '/public'));
 
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   res.render('index.ejs', { user: req.user });
 });
 
-app.get('/account', ensureAuthenticated, function(req, res) {
+app.get('/account', ensureAuthenticated, function (req, res) {
   res.render('account.ejs', { user: req.user });
 });
 
-app.get('/login', function(req, res) {
+app.get('/login', function (req, res) {
   res.render('login.ejs', { user: req.user });
 });
+
+
+
 
 // GET /auth/spotify
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -80,10 +105,10 @@ app.get('/login', function(req, res) {
 app.get(
   '/auth/spotify',
   passport.authenticate('spotify', {
-    scope: ['user-read-email', 'user-read-private','playlist-read-private'],
+    scope: ['user-read-email', 'user-read-private', 'playlist-read-private'],
     showDialog: true
   }),
-  function(req, res) {
+  function (req, res) {
     // The request will be redirected to spotify for authentication, so this
     // function will not be called.
   }
@@ -97,13 +122,13 @@ app.get(
 app.get(
   '/callback',
   passport.authenticate('spotify', { failureRedirect: '/login' }),
-  function(req, res) {
+  function (req, res) {
     res.redirect('/');
   }
 );
 
-app.get('/logout', function(req, res) {
-  
+app.get('/logout', function (req, res) {
+
   req.logout();
   res.redirect('/');
 });
