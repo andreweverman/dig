@@ -1,3 +1,7 @@
-function get_stuff(user){
-    document.write("AJAJAJJAJ")
+document.getElementById("test").addEventListener("click", get_stuff);
+
+
+function get_stuff() {
+    
+
 }
