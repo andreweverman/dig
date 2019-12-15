@@ -64,7 +64,7 @@ passport.use(
           user.save(err, user => {
             if (err) return console.error(err);
           });
-          
+
 
           return done(err, user);
         });
@@ -84,12 +84,36 @@ app.use(session({ secret: 'aunt jemima', resave: true, saveUninitialized: true }
 // persistent login sessions (recommended).
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(__dirname + '/public'));
+// app.use(express.static(__dirname + '/public'));
+app.use('/public', express.static(__dirname + '/public'));
 
 
 app.get('/', function (req, res) {
   res.render('index.ejs', { user: req.user });
 });
+
+app.get('/enable_dig', ensureAuthenticated, function (req, res) {
+
+  let playlists = "";
+  spotify_api.setAccessToken(req.user.access_token);
+  spotify_api.getUserPlaylists(req.user.username)
+    .then(function (data) {
+      playlists = data.body.items;
+      res.render('enable_dig.ejs', { user: req.user, playlists: playlists });
+    }, function (err) {
+      console.log('Something went wrong!', err);
+    });
+
+});
+
+app.get('/enable_dig/valid', ensureAuthenticated, function (req, res) {
+
+  // set the variables in mongoose for the dig and optional master
+  
+  res.redirect('/');
+
+});
+
 
 app.get('/account', ensureAuthenticated, function (req, res) {
   res.render('account.ejs', { user: req.user });

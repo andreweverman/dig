@@ -1,0 +1,21 @@
+<h2>Dig will need a playlist to write into
+    <br>A playlist to save all into
+</h2>
+
+
+<h2>Choose an exsisting playlist to become dig:</h2>
+
+<form id="submit_dig_credentials" action="">
+    <select id="dig_select" multiple size="<%=playlists.length%>">
+        <% playlists.forEach(list => { %>
+        <option value="<%=list.id%>"> <%=list.name%></option>
+        <%});%>
+
+    </select>
+    <br>
+    <input type="submit" value="Enable Dig">
+</form>
+
+
+
+<script src="/public/javascripts/enable_dig.js" type="text/javascript"></script>
