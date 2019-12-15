@@ -6,6 +6,10 @@ const config = require('./bin/config.json');
 module.exports = function (mongoose) {
   var User = new mongoose.Schema  ({
     user_id: { type: String, index: true, unique: true},
+    display_name: String,
+    username: String, 
+    photo:  String,
+    profile: Object,     
     access_token: String,
     refresh_token: String,
     services: []
