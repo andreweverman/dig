@@ -5,7 +5,9 @@ var express = require('express'),
   SpotifyStrategy = require('passport-spotify').Strategy,
   mongoose = require('mongoose'),
   findorcreate = require('mongoose-findorcreate'),
-  consolidate = require('consolidate');
+  consolidate = require('consolidate'),
+  spotify_web_api = require('spotify-web-api-node');
+
 
 
 
@@ -20,6 +22,9 @@ mongoose.set('useUnifiedTopology', true);
 mongoose.connect(config.MONGO_URL);
 var db = mongoose.connection;
 var models = require('./dig_db')(mongoose);
+
+// spotify setup.
+var spotify_api = new spotify_web_api(config);
 
 
 
@@ -48,26 +53,27 @@ passport.use(
         // and return that user instead.
 
         // gets the user based off id.
-        // 
         models.User.findOrCreate({ user_id: profile.id }, function (err, user) {
+          user.display_name = profile.displayName;
+          user.username = profile.username;
+          user.photo = profile.photos[0];
           user.access_token = access_token;
           user.refresh_token = refresh_token;
+
+          // saving user changes
           user.save(err, user => {
-            if (err) return console.error(err);            
-           
-
+            if (err) return console.error(err);
           });
+          
+
           return done(err, user);
-
         });
-
       });
-    }
-  )
+    })
 );
 
-var app = express();
 
+var app = express();
 // configure Express
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -78,7 +84,6 @@ app.use(session({ secret: 'aunt jemima', resave: true, saveUninitialized: true }
 // persistent login sessions (recommended).
 app.use(passport.initialize());
 app.use(passport.session());
-
 app.use(express.static(__dirname + '/public'));
 
 
@@ -128,7 +133,6 @@ app.get(
 );
 
 app.get('/logout', function (req, res) {
-
   req.logout();
   res.redirect('/');
 });

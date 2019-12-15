@@ -1,12 +1,17 @@
 
+<script src="/javascripts/user.js" type="text/javascript"></script>
 <% if (!user) {%>
-	<h2>Welcome! Please log in.</h2>
-	<p><a href="/login">login</a></p>
+<h2>Welcome! Please log in.</h2>
+<p><a href="/login">login</a></p>
 <%} else{ %>
-    <h2>Hello, <%= user.user_id %>.</h2>
-    <h2>Token = <%=user.access_token%></h2>
-    <h3> Your services: <%=user.services%> </h3>
-    <ul>
-        
-    </ul>
+<h2>Hello, <%= user.display_name%>.</h2>
+
+<h3> Your services: <%=user.services%> </h3>
+
+<button onclick="get_stuff();" class="test" type="button">
+    Get playlist tracks.
+</button>
 <% } %>
+
+
+

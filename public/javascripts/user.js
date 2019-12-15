@@ -1,2 +1,3 @@
-var username = document.getElementById('username');
-username.innerHTML = "FUCK";
+function get_stuff(user){
+    document.write("AJAJAJJAJ")
+}
