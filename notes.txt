@@ -1,0 +1,6 @@
+At end:
+    Token refresh works. Need to put in right spots and also assign the token to the user
+
+    Need to make dig document in MongoDB for each user. 
+
+    Setup Master optional param for the enable_dig

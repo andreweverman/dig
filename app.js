@@ -6,7 +6,8 @@ var express = require('express'),
   mongoose = require('mongoose'),
   findorcreate = require('mongoose-findorcreate'),
   consolidate = require('consolidate'),
-  spotify_web_api = require('spotify-web-api-node');
+  spotify_web_api = require('spotify-web-api-node'),
+  request = require('request');
 
 
 
@@ -59,6 +60,8 @@ passport.use(
           user.photo = profile.photos[0];
           user.access_token = access_token;
           user.refresh_token = refresh_token;
+          spotify_api.setRefreshToken(refresh_token);
+
 
           // saving user changes
           user.save(err, user => {
@@ -95,6 +98,9 @@ app.get('/', function (req, res) {
 app.get('/enable_dig', ensureAuthenticated, function (req, res) {
 
   let playlists = "";
+
+  
+
   spotify_api.setAccessToken(req.user.access_token);
   spotify_api.getUserPlaylists(req.user.username)
     .then(function (data) {
@@ -104,14 +110,45 @@ app.get('/enable_dig', ensureAuthenticated, function (req, res) {
       console.log('Something went wrong!', err);
     });
 
+
+
+
 });
 
 app.get('/enable_dig/valid', ensureAuthenticated, function (req, res) {
 
   // set the variables in mongoose for the dig and optional master
-  
+
   res.redirect('/');
 
+});
+
+
+app.get('/refresh_token', ensureAuthenticated, function (req, res){
+  // requesting access token from refresh token
+  let refresh_token = req.user.refresh_token;
+  let client_id = config.clientID;
+  let client_secret = config.clientSecret;
+
+  var authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    headers: { 'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')) },
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: refresh_token
+    },
+    json: true
+  };
+
+  request.post(authOptions, function (error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var access_token = body.access_token;
+      res.send({
+        'access_token': access_token
+      });
+
+    }
+  });
 });
 
 
@@ -174,3 +211,4 @@ function ensureAuthenticated(req, res, next) {
   }
   res.redirect('/login');
 }
+

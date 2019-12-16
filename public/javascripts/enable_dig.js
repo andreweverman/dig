@@ -7,7 +7,7 @@ function validate() {
 
     if (dig_select.value != ""){
         document.write("Henlo");
-        location.href ='/enable_dig/valid?dig_id='+dig_select.value;
+        location.assign('/enable_dig/valid?dig_id='+dig_select.value);
 
     }
     
