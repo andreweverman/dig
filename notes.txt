@@ -4,3 +4,14 @@ At end:
     Need to make dig document in MongoDB for each user. 
 
     Setup Master optional param for the enable_dig
+
+
+12/16: Thoughts for today:
+
+    The refresh token button works and the user gets the new access token.
+
+    Things to do from here: 
+        
+        *Make a scheduler go through each user and refresh their token and put it in db.
+
+        Get Dig Table set up for MongoDB

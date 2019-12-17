@@ -7,10 +7,10 @@ var express = require('express'),
   findorcreate = require('mongoose-findorcreate'),
   consolidate = require('consolidate'),
   spotify_web_api = require('spotify-web-api-node'),
-  request = require('request');
+  request = require('request'),
+  schedule = require('node-schedule');
 
-
-
+var dig = require("./dig");
 
 const config = require('./bin/config.json');
 
@@ -60,8 +60,6 @@ passport.use(
           user.photo = profile.photos[0];
           user.access_token = access_token;
           user.refresh_token = refresh_token;
-          spotify_api.setRefreshToken(refresh_token);
-
 
           // saving user changes
           user.save(err, user => {
@@ -99,7 +97,7 @@ app.get('/enable_dig', ensureAuthenticated, function (req, res) {
 
   let playlists = "";
 
-  
+
 
   spotify_api.setAccessToken(req.user.access_token);
   spotify_api.getUserPlaylists(req.user.username)
@@ -118,13 +116,24 @@ app.get('/enable_dig', ensureAuthenticated, function (req, res) {
 app.get('/enable_dig/valid', ensureAuthenticated, function (req, res) {
 
   // set the variables in mongoose for the dig and optional master
+  models.Dig.findOrCreate({ user_id: req.user.user_id }, function (err, dig) {
+
+    dig.user_id = req.user.user_id;
+    dig.dig_id = req.query.dig_id;
+    dig.dug_id = req.query.dug_id;
+
+    // saving user changes
+    dig.save(err, dig => {
+      if (err) return console.error(err);
+    });
+  });
 
   res.redirect('/');
 
 });
 
 
-app.get('/refresh_token', ensureAuthenticated, function (req, res){
+app.get('/refresh_token', ensureAuthenticated, function (req, res) {
   // requesting access token from refresh token
   let refresh_token = req.user.refresh_token;
   let client_id = config.clientID;
@@ -143,9 +152,22 @@ app.get('/refresh_token', ensureAuthenticated, function (req, res){
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var access_token = body.access_token;
+
       res.send({
         'access_token': access_token
       });
+
+      // need to save the updated access_token in the mongo_db
+      models.User.findOrCreate({ user_id: req.user.user_id }, function (err, user) {
+        user.access_token = access_token;
+
+        // saving user changes
+        user.save(err, user => {
+          if (err) return console.error(err);
+        });
+
+      });
+
 
     }
   });
@@ -212,3 +234,6 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login');
 }
 
+
+// run dig every 5 minutes
+var dig = schedule.scheduleJob('* /5 * * * *', dig);
