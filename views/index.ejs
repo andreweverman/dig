@@ -4,10 +4,10 @@
 <%} else{ %>
 <h2>Hello, <%= user.display_name%>.</h2>
 
-<h3> Your services: <%=user.services%> </h3>
+<h3> Your services: <%=user.services.toString()%> </h3>
 
 <form action="/enable_dig">
-    <button type="submit">Enable Dig</button>
+    <button type="submit"> Enable Dig </button>
 </form>
 <!-- <form action="/refresh_token">
     <button type="submit">Refresh Token</button>
@@ -25,7 +25,7 @@
 
 
 <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-<script src="/public/javascripts/index.js" type = "text/javascript" ></script>
+<script src="/public/javascripts/index.js" type="text/javascript"></script>
 
 
 <% } %>

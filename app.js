@@ -28,8 +28,6 @@ var models = require('./dig_db')(mongoose);
 var spotify_api = new spotify_web_api(config);
 
 
-
-
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
@@ -122,6 +120,23 @@ app.get('/enable_dig/valid', ensureAuthenticated, function (req, res) {
     dig.dig_id = req.query.dig_id;
     dig.dug_id = req.query.dug_id;
 
+    // arbitrary date that is too far back intentionally
+    dig.last_run =  new Date("1998-07-12T16:00:00Z");
+
+
+
+
+    models.User.findOrCreate({ user_id: req.user.user_id }, function (err, user) {
+      let in_services = user.services.includes("dig")
+      if (!in_services) {
+        user.services.push("dig");
+        user.save(err, user => {
+          if (err) return console.error(err);
+        });
+      }
+
+    });
+
     // saving user changes
     dig.save(err, dig => {
       if (err) return console.error(err);
@@ -167,8 +182,6 @@ app.get('/refresh_token', ensureAuthenticated, function (req, res) {
         });
 
       });
-
-
     }
   });
 });
@@ -193,7 +206,7 @@ app.get('/login', function (req, res) {
 app.get(
   '/auth/spotify',
   passport.authenticate('spotify', {
-    scope: ['user-read-email', 'user-read-private', 'playlist-read-private'],
+    scope: config.scope,
     showDialog: true
   }),
   function (req, res) {
@@ -236,4 +249,5 @@ function ensureAuthenticated(req, res, next) {
 
 
 // run dig every 5 minutes
-var dig = schedule.scheduleJob('* /5 * * * *', dig);
+dig();
+var dig = schedule.scheduleJob('*/5 * * * *', dig);
