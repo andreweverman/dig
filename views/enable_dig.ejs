@@ -5,7 +5,7 @@
 
 <h2>Choose an exsisting playlist to become dig:</h2>
 
-<form id="submit_dig_credentials" action="">
+<form id="dig_credentials" action="">
     <select id="dig_select" multiple size="<%=playlists.length%>">
         <% playlists.forEach(list => { %>
         <option value="<%=list.id%>"> <%=list.name%></option>
@@ -13,8 +13,20 @@
 
     </select>
     <br>
-    <input type="submit" value="Enable Dig">
 </form>
+
+
+<form id="dug_credentials" action="">
+    <select id="dug_select" multiple size="<%=playlists.length%>">
+        <% playlists.forEach(list => { %>
+        <option value="<%=list.id%>"> <%=list.name%></option>
+        <%});%>
+
+    </select>
+    <br>
+</form>
+
+<button class="btn btn-default" id="submit_dig">Submit</button>
 
 
 
