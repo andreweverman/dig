@@ -15,3 +15,9 @@ At end:
         *Make a scheduler go through each user and refresh their token and put it in db.
 
         Get Dig Table set up for MongoDB
+
+12/30: 
+
+    Try to not need to lookup the mongoose again
+
+    File management better !

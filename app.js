@@ -11,6 +11,7 @@ var express = require('express'),
   schedule = require('node-schedule');
 
 var dig = require("./dig");
+var refresh = require('./refresh');
 
 const config = require('./bin/config.json');
 
@@ -249,5 +250,14 @@ function ensureAuthenticated(req, res, next) {
 
 
 // run dig every 5 minutes
+refresh();
+var refresh_schedule = schedule.scheduleJob('*/30 * * * *', refresh);
+
+
+// run dig every 5 minutes
 dig();
-var dig = schedule.scheduleJob('*/5 * * * *', dig);
+var dig_schedule = schedule.scheduleJob('*/5 * * * *', dig);
+
+
+
+
