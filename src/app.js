@@ -13,7 +13,7 @@ var express = require('express'),
 var dig = require("./dig");
 var refresh = require('./refresh');
 
-const config = require('./bin/config.json');
+const config = require('../config/config.json');
 
 // mongoose setup
 
@@ -23,7 +23,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect(config.MONGO_URL);
 var db = mongoose.connection;
-var models = require('./dig_db')(mongoose);
+var models = require('../models/dig_db')(mongoose);
 
 // spotify setup.
 var spotify_api = new spotify_web_api(config);

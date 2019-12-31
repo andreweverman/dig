@@ -1,7 +1,7 @@
 var spotify_web_api = require('spotify-web-api-node');
 var mongoose = require('mongoose')
-const config = require('./bin/config.json');
-var models = require('./dig_db')(mongoose);
+const config = require('../config/config.json');
+var models = require('../models/dig_db')(mongoose);
 
 
 // from the scheduler

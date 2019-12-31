@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 var findorcreate = require('mongoose-findorcreate');
-const config = require('./bin/config.json');
+const config = require('../config/config.json');
 var models;
 
 
