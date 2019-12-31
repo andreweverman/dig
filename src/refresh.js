@@ -1,6 +1,7 @@
+var path = require("path");
+const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
-var mongoose = require('mongoose')
-const config = require('../config/config.json');
+var mongoose = require('mongoose');
 var models = require('../models/dig_db')(mongoose);
 var request = require('request');
 
@@ -8,7 +9,7 @@ var request = require('request');
 // will go and look in the mongodb for all users who will want to have dig run for them
 // pass these users on to the dig function below
 function refresh_tokens() {
-
+    
     models.User.find().exec(function (err, users) {
         if (err) throw err;
         users.forEach(user => {

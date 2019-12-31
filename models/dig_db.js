@@ -1,6 +1,8 @@
+var path  = require("path");
+const config = require(path.resolve("./config") + '/config.json');
 const mongoose = require('mongoose');
 var findorcreate = require('mongoose-findorcreate');
-const config = require('../config/config.json');
+
 var models;
 
 
