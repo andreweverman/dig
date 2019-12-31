@@ -6,12 +6,13 @@ var express = require('express'),
   mongoose = require('mongoose'),
   spotify_web_api = require('spotify-web-api-node'),
   request = require('request'),
-  schedule = require('node-schedule');
+  schedule = require('node-schedule'),
+  path = require("path");
 
-var dig = require("./dig");
+var dig = require("./services/dig");
 var refresh = require('./refresh');
 
-const config = require('../config/config.json');
+const config = require(path.resolve("./config") + '/config.json');
 
 // mongoose setup
 mongoose.set('useNewUrlParser', true);
