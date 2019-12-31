@@ -7,6 +7,7 @@ var models;
 module.exports = function (mongoose) {
 
   if (!models) {
+
     var User = new mongoose.Schema({
       user_id: { type: String, index: true, unique: true },
       display_name: String,
@@ -15,9 +16,11 @@ module.exports = function (mongoose) {
       profile: Object,
       access_token: String,
       refresh_token: String,
-      services: [{type: String}]
+      services: [{ type: String }]
     });
     User.plugin(findorcreate);
+
+
 
     var Dig = new mongoose.Schema({
       user_id: { type: String, index: true, unique: true },
@@ -27,13 +30,16 @@ module.exports = function (mongoose) {
 
     });
     Dig.plugin(findorcreate);
+
+
+    // exporting
     models = {
       User: mongoose.model('User', User),
       Dig: mongoose.model('Dig', Dig)
     }
   }
 
-  
+
 
   return models;
 }

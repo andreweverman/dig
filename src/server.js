@@ -4,8 +4,6 @@ var express = require('express'),
   expressLayouts = require('express-ejs-layouts'),
   SpotifyStrategy = require('passport-spotify').Strategy,
   mongoose = require('mongoose'),
-  findorcreate = require('mongoose-findorcreate'),
-  consolidate = require('consolidate'),
   spotify_web_api = require('spotify-web-api-node'),
   request = require('request'),
   schedule = require('node-schedule');
@@ -16,13 +14,13 @@ var refresh = require('./refresh');
 const config = require('../config/config.json');
 
 // mongoose setup
-
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect(config.MONGO_URL);
-var db = mongoose.connection;
+
+
 var models = require('../models/dig_db')(mongoose);
 
 // spotify setup.
@@ -96,8 +94,6 @@ app.get('/enable_dig', ensureAuthenticated, function (req, res) {
 
   let playlists = "";
 
-
-
   spotify_api.setAccessToken(req.user.access_token);
   spotify_api.getUserPlaylists(req.user.username)
     .then(function (data) {
@@ -122,10 +118,7 @@ app.get('/enable_dig/valid', ensureAuthenticated, function (req, res) {
     dig.dug_id = req.query.dug_id;
 
     // arbitrary date that is too far back intentionally
-    dig.last_run =  new Date("1998-07-12T16:00:00Z");
-
-
-
+    dig.last_run = new Date("1998-07-12T16:00:00Z");
 
     models.User.findOrCreate({ user_id: req.user.user_id }, function (err, user) {
       let in_services = user.services.includes("dig")

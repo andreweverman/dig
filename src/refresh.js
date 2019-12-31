@@ -9,9 +9,6 @@ var request = require('request');
 // pass these users on to the dig function below
 function refresh_tokens() {
 
-
-
-
     models.User.find().exec(function (err, users) {
         if (err) throw err;
         users.forEach(user => {
