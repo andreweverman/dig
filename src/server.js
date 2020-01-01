@@ -73,8 +73,9 @@ passport.use(
 
 
 var app = express();
+
 // configure Express
-app.set('views', __dirname + '/views');
+app.set('views', path.resolve("./views"));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 
@@ -84,64 +85,11 @@ app.use(session({ secret: 'aunt jemima', resave: true, saveUninitialized: true }
 app.use(passport.initialize());
 app.use(passport.session());
 // app.use(express.static(__dirname + '/public'));
-app.use('/public', express.static(__dirname + '/public'));
+app.use('/public', express.static(path.resolve("./public")));
 
+app.use('/', require(path.resolve("./routes/home")));
 
-app.get('/', function (req, res) {
-  res.render('index.ejs', { user: req.user });
-});
-
-app.get('/enable_dig', ensureAuthenticated, function (req, res) {
-
-  let playlists = "";
-
-  spotify_api.setAccessToken(req.user.access_token);
-  spotify_api.getUserPlaylists(req.user.username)
-    .then(function (data) {
-      playlists = data.body.items;
-      res.render('enable_dig.ejs', { user: req.user, playlists: playlists });
-    }, function (err) {
-      console.log('Something went wrong!', err);
-    });
-
-
-
-
-});
-
-app.get('/enable_dig/valid', ensureAuthenticated, function (req, res) {
-
-  // set the variables in mongoose for the dig and optional master
-  models.Dig.findOrCreate({ user_id: req.user.user_id }, function (err, dig) {
-
-    dig.user_id = req.user.user_id;
-    dig.dig_id = req.query.dig_id;
-    dig.dug_id = req.query.dug_id;
-
-    // arbitrary date that is too far back intentionally
-    dig.last_run = new Date("1998-07-12T16:00:00Z");
-
-    models.User.findOrCreate({ user_id: req.user.user_id }, function (err, user) {
-      let in_services = user.services.includes("dig")
-      if (!in_services) {
-        user.services.push("dig");
-        user.save(err, user => {
-          if (err) return console.error(err);
-        });
-      }
-
-    });
-
-    // saving user changes
-    dig.save(err, dig => {
-      if (err) return console.error(err);
-    });
-  });
-
-  res.redirect('/');
-
-});
-
+app.use('/enable_dig', require(path.resolve('./routes/services/enable_dig.js')));
 
 app.get('/refresh_token', ensureAuthenticated, function (req, res) {
   // requesting access token from refresh token
