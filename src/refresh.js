@@ -1,3 +1,7 @@
+// This code is what keeps the users access tokens fresh for use constantly
+// This is used at the bottom of the server file
+
+
 var path = require("path");
 const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
