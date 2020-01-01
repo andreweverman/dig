@@ -1,4 +1,4 @@
-var path  = require("path");
+var path = require("path");
 const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
 var mongoose = require('mongoose');
@@ -21,7 +21,7 @@ function run_dig() {
             });
         });
 
-        console.log("Done Digging")
+        console.log("Done Digging");
 
     });
 
