@@ -21,3 +21,11 @@ At end:
     Try to not need to lookup the mongoose again
 
     File management better !
+
+12/31: 
+
+    End of today:
+        File management is much better
+
+    To do: 
+       Try to not need to lookup the mongoose again

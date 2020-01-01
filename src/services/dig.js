@@ -1,3 +1,8 @@
+// This code is what runs the dig the users access tokens fresh for use constantly
+// This is used at the bottom of the server file
+
+// "Dig" is taking the recently saved tracks and making a small playlist of just those tracks
+
 var path = require("path");
 const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
