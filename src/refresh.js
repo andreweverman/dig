@@ -13,7 +13,7 @@ var request = require('request');
 // will go and look in the mongodb for all users who will want to have dig run for them
 // pass these users on to the dig function below
 function refresh_tokens() {
-    
+
     models.User.find().exec(function (err, users) {
         if (err) throw err;
         users.forEach(user => {
@@ -21,7 +21,7 @@ function refresh_tokens() {
         });
     });
 
-    console.log("Done Refreshing Tokens");
+
 }
 
 
@@ -66,7 +66,9 @@ class Refresh {
 
                 });
             }
+            console.log("[Refresh]:\tRefreshed a Token");
         });
+
     }
 }
 
