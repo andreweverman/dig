@@ -29,3 +29,14 @@ At end:
 
     To do: 
        Try to not need to lookup the mongoose again
+
+
+
+1/1: 
+
+
+    TODO: 
+        add the album save all tracks functionality as own service
+        add dug as own service
+        add discover weekly catalog as own service
+        add order dig as optional service param on dig
