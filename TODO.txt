@@ -1,42 +1,16 @@
-At end:
-    Token refresh works. Need to put in right spots and also assign the token to the user
+TODO: 
 
-    Need to make dig document in MongoDB for each user. 
-
-    Setup Master optional param for the enable_dig
-
-
-12/16: Thoughts for today:
-
-    The refresh token button works and the user gets the new access token.
-
-    Things to do from here: 
-        
-        *Make a scheduler go through each user and refresh their token and put it in db.
-
-        Get Dig Table set up for MongoDB
-
-12/30: 
-
-    Try to not need to lookup the mongoose again
-
-    File management better !
-
-12/31: 
-
-    End of today:
-        File management is much better
-
-    To do: 
-       Try to not need to lookup the mongoose again
-
-
-
-1/1: 
-
-
-    TODO: 
+    services:
         add the album save all tracks functionality as own service
         add dug as own service
         add discover weekly catalog as own service
         add order dig as optional service param on dig
+
+        dig: 
+            make it to where I dont have to relookup thingsfrom the db
+    
+        * add when you enable service it adds to user's db
+        
+    views:
+        change when user has service what button says and does
+    
