@@ -60,7 +60,7 @@ var dig_schedule = schedule.scheduleJob('*/5 * * * *', dig);
 
 // run dug every 5 minutes
 dug();
-var dig_schedule = schedule.scheduleJob('*/5 * * * *', dug);
+var dug_schedule = schedule.scheduleJob('*/5 * * * *', dug);
 
 
 
