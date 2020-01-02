@@ -32,7 +32,7 @@ function run_dig() {
             models.User.findOne({ user_id: member.user_id }).exec(function (err, user) {
                 if (err) throw err;
 
-                new Dig(member.user_id, member.dig_id, member.dug_id, member.last_run, user.access_token, user, digs);
+                new Dig(member.user_id, member.dig_id,  member.last_run, user.access_token, user, digs);
 
             });
         });
@@ -62,13 +62,12 @@ TODO * @param {mongoose}    user_db         The mongoose object for the user
 TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      * @return {int}    The difference in days
      */
-    constructor(user_id, dig_id, dug_id, last_run, access_token, user_db, dig_db) {
+    constructor(user_id, dig_id, last_run, access_token, user_db, dig_db) {
         // setting needed variables
         this.user_id = user_id;
         this.dig_id = dig_id;
-        this.dug_id = dug_id;
         this.access_token = access_token;
-        this.last_run = last_run
+        this.last_run = last_run;
 
         this.user_db = user_db;
         this.dig_db = dig_db;
@@ -91,25 +90,8 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      * @param {Object}  track_added     the date object for the track that we are comparing against
      */
     dig() {
-
-
-        // check if there is something new that would mean we should add to dig
-        if (this.check_run()) {
-
-            this.add_dig();
-
-            // TODO: sort dig by album. make optional user parameter
-
-
-        }
-        else {
-            // this will be run by both, but I for sequencing purposes this is how it will be done
-            this.trim_tracks();
-
-        }
-
-
-
+        
+        this.check_run() ? this.add_dig() : this.trim_tracks();
 
     }
 

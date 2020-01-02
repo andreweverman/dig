@@ -36,6 +36,8 @@ app.use('/', require(path.resolve('./routes/login')));
 
 app.use('/enable_dig', require(path.resolve('./routes/services/enable_dig.js')));
 
+app.use('/enable_dug', require(path.resolve('./routes/services/enable_dug.js')));
+
 
 // \ - - - - - -  EDN MY ROUTES - - - - - - /
 
@@ -44,6 +46,7 @@ app.use('/enable_dig', require(path.resolve('./routes/services/enable_dig.js')))
 
 // ! - - - - - - SERVICES SCHEDULES - - - - - - !
 var dig = require("./services/dig"),
+  dug = require('./services/dug')
   refresh = require('./refresh');
 
 // run refresh tokens every 30
@@ -54,6 +57,10 @@ var refresh_schedule = schedule.scheduleJob('*/30 * * * *', refresh);
 // run dig every 5 minutes
 dig();
 var dig_schedule = schedule.scheduleJob('*/5 * * * *', dig);
+
+// run dug every 5 minutes
+dug();
+var dig_schedule = schedule.scheduleJob('*/5 * * * *', dug);
 
 
 

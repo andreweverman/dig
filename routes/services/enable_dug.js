@@ -17,7 +17,7 @@ router.get('/', ensureAuthenticated, function (req, res) {
     spotify_api.getUserPlaylists(req.user.username)
         .then(function (data) {
             playlists = data.body.items;
-            res.render('enable_dig.ejs', { user: req.user, playlists: playlists });
+            res.render('enable_dug.ejs', { user: req.user, playlists: playlists });
         }, function (err) {
             console.log('Something went wrong!', err);
         });
@@ -27,13 +27,13 @@ router.get('/', ensureAuthenticated, function (req, res) {
 router.get('/valid', ensureAuthenticated, function (req, res) {
 
     // set the variables in mongoose for the dig and optional master
-    models.Dig.findOrCreate({ user_id: req.user.user_id }, function (err, dig) {
+    models.Dug.findOrCreate({ user_id: req.user.user_id }, function (err, dug) {
 
-        dig.user_id = req.user.user_id;
-        dig.dig_id = req.query.dig_id;      
+        dug.user_id = req.user.user_id;       
+        dug.dug_id = req.query.dug_id;
 
         // arbitrary date that is too far back intentionally
-        dig.last_run = new Date("1998-07-12T16:00:00Z");
+        dug.last_run = new Date("1998-07-12T16:00:00Z");
 
         models.User.findOrCreate({ user_id: req.user.user_id }, function (err, user) {
             let in_services = user.services.includes("dig")
@@ -47,7 +47,7 @@ router.get('/valid', ensureAuthenticated, function (req, res) {
         });
 
         // saving user changes
-        dig.save(err, dig => {
+        dug.save(err, dig => {
             if (err) return console.error(err);
         });
     });

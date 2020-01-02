@@ -18,19 +18,6 @@
     <br>
 </form>
 
-
-<form id="dug_credentials" action="">
-    <select id="dug_select" multiple size="<%=playlists.length%>">
-        <% playlists.forEach(list => { %>
-        <option value="<%=list.id%>"> <%=list.name%></option>
-        <%});%>
-
-    </select>
-    <br>
-</form>
-
 <button class="btn btn-default" id="submit_dig">Submit</button>
-
-
 
 <script src="/public/javascripts/enable_dig.js" type="text/javascript"></script>

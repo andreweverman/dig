@@ -26,18 +26,26 @@ module.exports = function (mongoose) {
 
     var Dig = new mongoose.Schema({
       user_id: { type: String, index: true, unique: true },
-      dig_id: String,
-      dug_id: String,
+      dig_id: String,    
       last_run: Date
 
     });
     Dig.plugin(findorcreate);
 
+    var Dug = new mongoose.Schema({
+      user_id: { type: String, index: true, unique: true },  
+      dug_id: String,
+      last_run: Date
+
+    });
+    Dug.plugin(findorcreate);
+
 
     // exporting
     models = {
       User: mongoose.model('User', User),
-      Dig: mongoose.model('Dig', Dig)
+      Dig: mongoose.model('Dig', Dig),
+      Dug: mongoose.model('Dug', Dug)
     }
   }
 
