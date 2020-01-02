@@ -79,18 +79,64 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
 
     }
 
-    /*  
-     * Runs the dig service for the @this.user_id.
+    /*
+     * Adds tracks from dig that have been recently saved.
      *
-     * Dug will add the most recently saved tracks to the @this.dig_id.
-     * It will also remove any tracks that have been in there for a week, keeping a minimum of 20 tracks
-     * There is also an option to have it automatically sort the tracks by album. 
+     * Adds all recently saved tracks by the user to the this.dig_id playlist
      * 
-     * @param {Object}  track_added     the date object for the track that we are comparing against
      */
     dug() {
 
+        var new_saved_tracks = this.new_saved_tracks();
+        var dug = this;
 
+
+        this.spotify_api.addTracksToPlaylist(this.dug_id, new_saved_tracks, { position: 0 }).then(function (data) {
+
+            // we will write that we ran dig at this point. most important thing is that the tracks were added. 
+            models.Dug.findOne({ user_id: dug.user_id }).exec(function (err, user) {
+                if (err) throw err;
+
+                user.last_run = new Date();
+                user.save(err, user => {
+                    if (err) return console.error(err);
+                });
+               
+            });
+
+
+
+        }, function (err) {
+            console.log('[Dig]: Error adding tracks for user: ' + dug.user_id, err);
+        });
+
+
+    }
+
+    /*
+     * Gets the recently saved tracks from the user. 
+     *
+     * Looks in the user's saved tracks and then only grabs the new ones. This is determined by comparing the save
+     * date to the last run date in the db for that user. 
+     * 
+     * @return {String} An array of the track uri's that need to be saved.     
+     */
+    new_saved_tracks() {
+
+        let new_tracks = []
+
+        for (let i = 0; i < this.saved_tracks.length; i++) {
+            let track = this.saved_tracks[i]
+
+            if (this.last_run > new Date(track.added_at)) {
+                break;
+            }
+            else {
+                new_tracks.push(track.track.uri)
+            }
+        }
+
+        return new_tracks;
     }
 
 
@@ -104,8 +150,8 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
     get_necessary() {
 
         Promise.all([
-            this.spotify_api.getMySavedAlbums({
-                limit: 10,
+            this.spotify_api.getMySavedTracks({
+                limit: 50,
                 offset: 0
             }),
             this.spotify_api.getPlaylistTracks(this.dug_id)
