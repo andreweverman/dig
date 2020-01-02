@@ -32,15 +32,11 @@ function run_dig() {
             models.User.findOne({ user_id: member.user_id }).exec(function (err, user) {
                 if (err) throw err;
 
-                new Dig(member.user_id, member.dig_id,  member.last_run, user.access_token, user, digs);
+                new Dig(member.user_id, member.dig_id, member.last_run, user.access_token, user, digs);
 
             });
         });
-
-
-
     });
-
 }
 
 class Dig {
@@ -90,7 +86,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      * @param {Object}  track_added     the date object for the track that we are comparing against
      */
     dig() {
-        
+
         this.check_run() ? this.add_dig() : this.trim_tracks();
 
     }
@@ -148,7 +144,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
         if (stale_tracks.length != 0 && this.dig_tracks.length > length_min) {
 
             let remove_tracks = stale_tracks.slice(0, this.dig_tracks.length - length_min);
-            let remove_uris = remove_tracks.map(track => { return {uri: track.track.uri}});
+            let remove_uris = remove_tracks.map(track => { return { uri: track.track.uri } });
 
             this.spotify_api.removeTracksFromPlaylist(this.dig_id, remove_uris).then(function (data) {
                 console.log('[Dig]: Successful trim!');
