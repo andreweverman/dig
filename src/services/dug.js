@@ -90,6 +90,7 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
         var new_saved_tracks = this.new_saved_tracks();
         var dug = this;
 
+        if (new_saved_tracks.length == 0) return;
 
         this.spotify_api.addTracksToPlaylist(this.dug_id, new_saved_tracks, { position: 0 }).then(function (data) {
 
@@ -104,10 +105,8 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
                
             });
 
-
-
         }, function (err) {
-            console.log('[Dig]: Error adding tracks for user: ' + dug.user_id, err);
+            console.log('[Dug]: Error adding tracks for user: ' + dug.user_id, err);
         });
 
 
