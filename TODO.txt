@@ -9,6 +9,9 @@ TODO:
 
         dig: 
             make it to where I dont have to relookup thingsfrom the db
+
+        dig + dig:
+            option to create the playlist for the user
     
 
         
