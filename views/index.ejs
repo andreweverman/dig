@@ -1,10 +1,48 @@
 <% if (!user) {%>
 <h2>Welcome! Please log in.</h2>
-<p><a href="/login">Login</a></p>
+<p><a href="/auth/spotify">Login</a></p>
 <%} else{ %>
 <h2>Hello, <%= user.display_name%>.</h2>
 
-<h3> Your services: <%=user.services.toString()%> </h3>
+<h3> Your Services: <br></h3>
+
+
+<div class="enabled_services">
+    <!-- adding the cards for each service -->
+    <%user.services.forEach( service => { %>
+
+    <div class="card" style="max-width: 18rem;">
+
+        <div class="card-body">
+            <h5 class="card-title"><%=service.name%></h5>
+            <p class="card-text"><%=service.description%></p>
+            <a href="#" class="btn btn-primary">Edit <%=service.name%></a>
+            <a href="#" class="btn btn-primary">Disable <%=service.name%></a>
+        </div>
+    </div>
+
+</div>
+
+<% });%>
+
+
+<div class="disbled_services">
+    <!-- adding the cards for each service -->
+    <%user.services.forEach( service => { %>
+
+    <div class="card" style="max-width: 18rem;">
+
+        <div class="card-body">
+            <h5 class="card-title"><%=service.name%></h5>
+            <p class="card-text"><%=service.description%></p>
+            <a href="#" class="btn btn-primary">Enable <%=service.name%></a>
+         
+        </div>
+    </div>
+
+</div>
+
+<% });%>
 
 <form action="/enable_dig">
     <button type="submit"> Enable Dig </button>

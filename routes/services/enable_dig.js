@@ -4,6 +4,11 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var models = require(path.resolve('./models/dig_db'))(mongoose);
 
+var service_util = require('./service_util');
+var ensureAuthenticated = service_util.ensureAuthenticated;
+var service_name = "Dig";
+var service_description = "An updated playlist of your most recently saved tracks"
+
 const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
 
@@ -35,16 +40,8 @@ router.get('/valid', ensureAuthenticated, function (req, res) {
         // arbitrary date that is too far back intentionally
         dig.last_run = new Date("1998-07-12T16:00:00Z");
 
-        models.User.findOrCreate({ user_id: req.user.user_id }, function (err, user) {
-            let in_services = user.services.includes("dig")
-            if (!in_services) {
-                user.services.push("dig");
-                user.save(err, user => {
-                    if (err) return console.error(err);
-                });
-            }
 
-        });
+        service_util.add_service_to_user(service_name, service_description, req.user.user_id);
 
         // saving user changes
         dig.save(err, dig => {
@@ -56,12 +53,7 @@ router.get('/valid', ensureAuthenticated, function (req, res) {
 
 });
 
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/login');
-}
+
 
 
 

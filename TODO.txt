@@ -2,15 +2,25 @@ TODO:
 
     services:
         add the album save all tracks functionality as own service
-        add dug as own service
+
         add discover weekly catalog as own service
         add order dig as optional service param on dig
+        able to remove services
 
         dig: 
             make it to where I dont have to relookup thingsfrom the db
     
-        * add when you enable service it adds to user's db
+
         
     views:
         change when user has service what button says and does
+
+        need some jquery to get the services to hot reload every time
+
+        add routes and views for edit and disable services
     
+
+
+Working on currently: 
+
+     change when user has service what button says and does

@@ -15,6 +15,7 @@ const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
 var mongoose = require('mongoose');
 var models = require('../../models/dig_db')(mongoose);
+var service_name = "Dig";
 
 /*  
 * The outer most function for running Dig. 
@@ -147,9 +148,9 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             let remove_uris = remove_tracks.map(track => { return { uri: track.track.uri } });
 
             this.spotify_api.removeTracksFromPlaylist(this.dig_id, remove_uris).then(function (data) {
-                console.log('[Dig]: Successful trim!');
+                console.log('[',service_name,']: Successful trim!');
             }, function (err) {
-                console.log('[Dig]: Error trimming tracks for user: ' + dig.user_id, err);
+                console.log('[',service_name,']: Error trimming tracks for user: ' + dig.user_id, err);
             });
 
         }
@@ -220,7 +221,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
 
 
         }, function (err) {
-            console.log('[Dig]: Error adding tracks for user: ' + dig.user_id, err);
+            console.log('[',service_name,']: Error adding tracks for user: ' + dig.user_id, err);
         });
 
 
@@ -272,9 +273,9 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             this.dig_tracks = result[1].body.items;
 
             this.dig();
-            console.log("[Dig]:\t\tDig finished for a user");
+            console.log("[",service_name,"]:\t\tDig finished for user: ", this.user_id);
         }).catch(error => {
-            console.error("[Dig]:\t\tError getting info from spotify ", error)
+            console.error("[",service_name,"]:\t\tError getting info from spotify ", error)
         });
     }
 }
