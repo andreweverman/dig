@@ -32,7 +32,7 @@ function run_dug() {
             models.User.findOne({ user_id: member.user_id }).exec(function (err, user) {
                 if (err) throw err;
 
-                new Dug(member.user_id, member.dug_id, member.last_run, user.access_token, user, dugs);
+                if (user){new Dug(member.user_id, member.dug_id, member.last_run, user.access_token, user, dugs);}
 
             });
         });

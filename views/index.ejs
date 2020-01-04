@@ -8,15 +8,15 @@
 
 
 <div class="enabled_services">
-    <!-- adding the cards for each service -->
-    <%user.services.forEach( service => { %>
+
+    <%enabled_services.forEach( service => { %>
 
     <div class="card" style="max-width: 18rem;">
 
         <div class="card-body">
             <h5 class="card-title"><%=service.name%></h5>
             <p class="card-text"><%=service.description%></p>
-            <a href="#" class="btn btn-primary">Edit <%=service.name%></a>
+            <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Edit <%=service.name%></a>
             <a href="#" class="btn btn-primary">Disable <%=service.name%></a>
         </div>
     </div>
@@ -25,18 +25,19 @@
 
 <% });%>
 
-
+<hr>
+<h3> Available Services: <br></h3>
 <div class="disbled_services">
-    <!-- adding the cards for each service -->
-    <%user.services.forEach( service => { %>
+
+    <%disabled_services.forEach( service => { %>
 
     <div class="card" style="max-width: 18rem;">
 
         <div class="card-body">
             <h5 class="card-title"><%=service.name%></h5>
             <p class="card-text"><%=service.description%></p>
-            <a href="#" class="btn btn-primary">Enable <%=service.name%></a>
-         
+            <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Enable <%=service.name%></a>
+
         </div>
     </div>
 
@@ -44,17 +45,7 @@
 
 <% });%>
 
-<form action="/enable_dig">
-    <button type="submit"> Enable Dig </button>
-</form>
-
-<form action="/enable_dug">
-    <button type="submit"> Enable Dug </button>
-</form>
-
-
-
-<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="jquery-3.4.1.min.js"></script>
 <script src="/public/javascripts/index.js" type="text/javascript"></script>
 
 

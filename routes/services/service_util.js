@@ -24,16 +24,16 @@ var models = require('../../models/dig_db')(mongoose);
  * 
  * @param {string}  service_name     the name of the service we will be adding into the db
  */
-function add_service_to_user(service_name, service_description, user_id) {
+function add_service_to_user(service_name, user_id) {
 
 
     models.User.findOrCreate({ user_id: user_id }, function (err, user) {
         let in_services = user.services.includes(service_name)
         if (!in_services) {
-            user.services.push({name: service_name, description:service_description});
+            user.services.push(service_name);
 
             // sorting them for better look
-            user.services.sort((a, b) => (a.name > b.name) ? 1 :0)
+            user.services.sort((a, b) => (a > b) ? 1 :0)
 
             user.save(err, user => {
                 if (err) return console.error(err);

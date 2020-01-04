@@ -7,7 +7,7 @@ var models = require(path.resolve('./models/dig_db'))(mongoose);
 var service_util = require('./service_util');
 var ensureAuthenticated = service_util.ensureAuthenticated;
 var service_name = "Dig";
-var service_description = "An updated playlist of your most recently saved tracks"
+
 
 const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
@@ -41,7 +41,7 @@ router.get('/valid', ensureAuthenticated, function (req, res) {
         dig.last_run = new Date("1998-07-12T16:00:00Z");
 
 
-        service_util.add_service_to_user(service_name, service_description, req.user.user_id);
+        service_util.add_service_to_user(service_name,  req.user.user_id);
 
         // saving user changes
         dig.save(err, dig => {

@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Dig",
+        "description": "An updated playlist of your most recently saved tracks"
+    },
+    {
+        "name": "Dug",
+        "description": "Stores all of your liked tracks to a designated playlist"
+    },
+    {
+        "name": "Catalog",
+        "description": "Stores all Discover Weekly songs into one playlist"
+    }
+]

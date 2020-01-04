@@ -1,5 +1,5 @@
 var path = require('path');
-var fs = require('fs');
+
 
 
 const config = require(path.resolve("./config") + '/config.json');
@@ -13,32 +13,20 @@ var passport_sp = require(path.resolve('./src/passport_sp.js'));
 var ensureAuthenticated = passport_sp.ensureAuthenticated;
 
 router.get('/', function (req, res) {
-    var user = req.user;
-    // if (user) {
-        // fs.readdir(services_path, (err, files) => {
+    let all_services = require('./services/descriptions.json');
+    let user = req.user;
+    if (user) {
+        let disabled_services = all_services.filter(service => !user.services.some(en_service => en_service == service.name));
 
-        //     // gets all services
-        //     var all_services = files.map(file => {
-        //         let split = file.split(".")[0]
-        //         return split.charAt(0).toUpperCase() + split.slice(1);
-        //     });
+        let enabled_services = all_services.filter(service => user.services.some(en_service => en_service == service.name));
 
-        //     // want to get the services we have - services the user has
+        res.render('index.ejs', { user: req.user, enabled_services: enabled_services, disabled_services: disabled_services });
 
-        //     var disabled_services = all_services;
+    }
+    else {
+        res.render('index.ejs', { user: req.user });
+    }
 
-
-        //     disabled_services.filter(service => !user.services.some(en_service => { en_service == service }));
-
-
-
-        //     console.log(all_services)
-        //     res.render('index.ejs', { user: req.user, disabled_services: disabled_services });
-
-        // });
-
-    // }
-    res.render('index.ejs', { user: req.user});
 
 
 
