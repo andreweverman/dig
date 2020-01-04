@@ -13,7 +13,6 @@ TODO:
 
         
     views:
-        change when user has service what button says and does
 
         need some jquery to get the services to hot reload every time
 
@@ -23,4 +22,4 @@ TODO:
 
 Working on currently: 
 
-     change when user has service what button says and does
+

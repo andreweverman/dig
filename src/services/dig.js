@@ -33,7 +33,7 @@ function run_dig() {
             models.User.findOne({ user_id: member.user_id }).exec(function (err, user) {
                 if (err) throw err;
 
-                new Dig(member.user_id, member.dig_id, member.last_run, user.access_token, user, digs);
+                if (user) { new Dig(member.user_id, member.dig_id, member.last_run, user.access_token, user, digs) }
 
             });
         });
@@ -104,7 +104,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      * @return {bool}    true for should run, false if not
      */
     check_run() {
-        return this.last_run < new Date(this.saved_tracks[0].added_at);
+        return this.last_run < new Date(this.saved_tracks[0].added_at) || this.dig_tracks.length == 0;
     }
 
     /*  
@@ -148,9 +148,9 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             let remove_uris = remove_tracks.map(track => { return { uri: track.track.uri } });
 
             this.spotify_api.removeTracksFromPlaylist(this.dig_id, remove_uris).then(function (data) {
-                console.log('[',service_name,']: Successful trim!');
+                console.log('[', service_name, ']: Successful trim!');
             }, function (err) {
-                console.log('[',service_name,']: Error trimming tracks for user: ' + dig.user_id, err);
+                console.log('[', service_name, ']: Error trimming tracks for user: ' + dig.user_id, err);
             });
 
         }
@@ -221,7 +221,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
 
 
         }, function (err) {
-            console.log('[',service_name,']: Error adding tracks for user: ' + dig.user_id, err);
+            console.log('[', service_name, ']: Error adding tracks for user: ' + dig.user_id, err);
         });
 
 
@@ -239,14 +239,22 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
 
         let new_tracks = []
 
-        for (let i = 0; i < this.saved_tracks.length; i++) {
-            let track = this.saved_tracks[i]
+        if (this.dig_tracks.length != 0) {
+            for (let i = 0; i < this.saved_tracks.length; i++) {
+                let track = this.saved_tracks[i]
 
-            if (this.last_run > new Date(track.added_at)) {
-                break;
+                if (this.last_run > new Date(track.added_at)) {
+                    break;
+                }
+                else {
+                    new_tracks.push(track.track.uri)
+                }
             }
-            else {
-                new_tracks.push(track.track.uri)
+        }
+        else {
+            for (let i = 0; i < 20; i++) {
+                let track = this.saved_tracks[i];
+                new_tracks.push(track.track.uri);
             }
         }
 
@@ -273,9 +281,9 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             this.dig_tracks = result[1].body.items;
 
             this.dig();
-            console.log("[",service_name,"]:\t\tDig finished for user: ", this.user_id);
+            console.log("[", service_name, "]:\t\tDig finished for user: ", this.user_id);
         }).catch(error => {
-            console.error("[",service_name,"]:\t\tError getting info from spotify ", error)
+            console.error("[", service_name, "]:\t\tError getting info from spotify ", error)
         });
     }
 }
