@@ -14,6 +14,7 @@ const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
 var mongoose = require('mongoose');
 var models = require('../../models/dig_db')(mongoose);
+var service_name = "Dug"
 
 /*  
 * The outer most function for running Dug. 
@@ -106,7 +107,7 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
             });
 
         }, function (err) {
-            console.log('[Dug]: Error adding tracks for user: ' + dug.user_id, err);
+            console.log('[',service_name,']: Error adding tracks for user: ' + dug.user_id, err);
         });
 
 
@@ -160,9 +161,9 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
             this.dug_tracks = result[1].body.items;
 
             this.dug();
-            console.log("[Dug]:\t\tDug finished for a user");
+            console.log("[",service_name,"]:\t\tDug finished for user: ", this.user_id);
         }).catch(error => {
-            console.error("[Dug]:\t\tError getting info from spotify ", error)
+            console.error("[",service_name,"]:\t\tError getting info from spotify ", error)
         });
 
 

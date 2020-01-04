@@ -18,7 +18,7 @@ module.exports = function (mongoose) {
       profile: Object,
       access_token: String,
       refresh_token: String,
-      services: [{ type: String }]
+      services: [{ type: Object }]
     });
     User.plugin(findorcreate);
 
