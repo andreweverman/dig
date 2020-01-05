@@ -1,0 +1,25 @@
+body {
+    background-color: #484B49;
+}
+
+.jumbotron {
+    background-image: url(https://cdn.wallpapersafari.com/34/88/yTgRnO.jpg);
+}
+
+.justify_left_jumbotron {
+    width: 50%;
+    margin: 0 auto;
+}
+
+#login {
+    margin-top: 1em;
+}
+
+.signed_in_container {
+    color: whitesmoke;
+    text-align: center;
+}
+
+.card{
+    margin-top: 1em;
+}

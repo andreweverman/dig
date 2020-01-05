@@ -1,49 +1,127 @@
+<!-- not signed in -->
+
 <% if (!user) {%>
-<h2>Welcome! Please log in.</h2>
-<p><a href="/auth/spotify">Login</a></p>
-<%} else{ %>
-<h2>Hello, <%= user.display_name%>.</h2>
-
-<h3> Your Services: <br></h3>
 
 
-<div class="enabled_services">
-
-    <%enabled_services.forEach( service => { %>
-
-    <div class="card" style="max-width: 18rem;">
-
-        <div class="card-body">
-            <h5 class="card-title"><%=service.name%></h5>
-            <p class="card-text"><%=service.description%></p>
-            <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Edit <%=service.name%></a>
-            <a href="#" class="btn btn-primary">Disable <%=service.name%></a>
-        </div>
+<div class="jumbotron horizontal-center vertical-center ">
+    <div class="text-center">
+        <h1 class="display-4">Welcome to Dig</h1>
+        <p class="lead">Dig helps you organize your Spotify playlists.</p>
+        <hr class="my-4">
     </div>
+
+    <div class="justify_left_jumbotron">
+        <p class="services">Current services: </p>
+        <ul class="list-group">
+            <li class="list-group-item"> Dig: A small playlist of recently saved tracks</li>
+            <li class="list-group-item"> Dug: All saved tracks in one location.</li>
+            <li class="list-group-item"> Catalog: All songs from your discover weeklys.</li>
+        </ul>
+
+
+    </div>
+
+    <div class="text-center">
+        <a class="btn btn-primary btn-lg" href="/auth/spotify" role="button" id="login">Login</a>
+    </div>
+
 
 </div>
 
-<% });%>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- signed in -->
+<%} else{ %>
+
+<div class="signed_in_container">
+    <h2>Hello, <%= user.display_name%>.</h2>
+
+
+    <div class="services">
+
+        <h3> Your Services: </h3>
+
+        <div class="enabled_services">
+
+            <div class="row justify-content-md-center">
+
+                <%enabled_services.forEach( (service, enabled_service_count)  => { %>
+
+                <% if (enabled_service_count % 3 ==0 && enabled_service_count != 0) { %>
+            </div>
+
+            <div class="row justify-content-md-center">
+
+                <%}%>
+
+                <div class="col col-lg-2">
+                    <div class="card bg-success" style="max-width: 18rem;">
+
+                        <div class="card-body">
+                            <h5 class="card-title"><%=service.name%></h5>
+                <p class="card-text"><%=service.description%></p>
+                <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Edit
+                    <%=service.name%></a>
+                <a href="#" class="btn btn-danger">Disable <%=service.name%></a>
+            </div>
+        </div>
+
+    </div>
+    <% });%>
+</div>
+</div>
+
+
+
 
 <hr>
-<h3> Available Services: <br></h3>
+
+<h3> Available Services: </h3>
+
 <div class="disbled_services">
 
-    <%disabled_services.forEach( service => { %>
+    <div class="row justify-content-md-center">
 
-    <div class="card" style="max-width: 18rem;">
 
-        <div class="card-body">
-            <h5 class="card-title"><%=service.name%></h5>
-            <p class="card-text"><%=service.description%></p>
-            <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Enable <%=service.name%></a>
+        <%disabled_services.forEach( (service, disabled_service_count) => { %>
 
-        </div>
+        <% if (disabled_service_count % 3 ==0 && disabled_service_count != 0) { %>
     </div>
+    <div class="row justify-content-md-center">
+
+        <%}%>
+                <div class="col col-lg-2">
+                    <div class="card bg-info" style="max-width: 18rem;">
+
+                        <div class="card-body">
+                            <h5 class="card-title"><%=service.name%></h5>
+        <p class="card-text"><%=service.description%></p>
+        <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Enable
+            <%=service.name%></a>
+
+    </div>
+</div>
 
 </div>
 
 <% });%>
+</div>
+</div>
+</div>
+</div>
+
+
+</div>
 
 <script src="jquery-3.4.1.min.js"></script>
 <script src="/public/javascripts/index.js" type="text/javascript"></script>
