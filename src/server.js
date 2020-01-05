@@ -4,7 +4,8 @@ var express = require('express'),
   expressLayouts = require('express-ejs-layouts'),
   mongoose = require('mongoose'),
   schedule = require('node-schedule'),
-  path = require("path");
+  path = require("path"),
+  bodyParser = require('body-parser');
 
 
 // < - - - - - - SERVER SETUP - - - - - - >
@@ -17,9 +18,11 @@ mongoose.connect(config.MONGO_URL, { useNewUrlParser: true, useFindAndModify: tr
 var passport = passport_sp.passport;
 
 var app = express();
+app.use(bodyParser.urlencoded({ extended: false }))
 app.set('views', path.resolve("./views"));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
+
 app.use(session({ secret: 'aunt jemima', resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -47,7 +50,7 @@ app.use('/enable_dug', require(path.resolve('./routes/services/enable_dug.js')))
 // ! - - - - - - SERVICES SCHEDULES - - - - - - !
 var dig = require("./services/dig"),
   dug = require('./services/dug')
-  refresh = require('./refresh');
+refresh = require('./refresh');
 
 // run refresh tokens every 30
 refresh();

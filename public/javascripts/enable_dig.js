@@ -7,13 +7,17 @@ $('#submit_dig').click(
         let val = $(".existing_playlists").find('.list-group-item-success')
         let dig_id = val[0].value
         if (dig_id != "") {
-            document.write("Redirecting");
-            location.assign('/enable_dig/valid?dig_id=' + dig_id);
+            $.post( "/enable_dig", { dig_id: dig_id} , function(data){
+                window.location.href = "/";
+            });
+            
+            
+            // location.assign('/enable_dig/valid?dig_id=' + dig_id);
 
         }
     }
 
-)
+);
 
 
 // this is for the selecting of the playlist element
@@ -36,8 +40,33 @@ $('.playlist_item').click(function change() {
     if ($('#dig_select').val() != '') {
         $('#submit_dig').prop('disabled', false)
     }
-})
+});
 
 
+
+
+
+// disabling of button if no text
+$("#create_playlist_text").change(function check() {
+
+    let enabled = !($("#create_playlist_submit").prop("disabled"));
+    let empty = ($(this).val() == '');
+    let val = true;
+
+
+    $("#create_playlist_submit").prop("disabled", enabled && empty);
+
+
+});
+
+$("#create_playlist_submit").hover(function check() {
+
+
+    let empty = ($("#create_playlist_text").val() == '');
+
+    $(this).prop("disabled", empty);
+
+
+});
 
 

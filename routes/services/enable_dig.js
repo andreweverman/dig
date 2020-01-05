@@ -29,27 +29,43 @@ router.get('/', ensureAuthenticated, function (req, res) {
 
 });
 
-router.get('/valid', ensureAuthenticated, function (req, res) {
+router.post('/', ensureAuthenticated, function (req, res) {
 
-    // set the variables in mongoose for the dig and optional master
-    models.Dig.findOrCreate({ user_id: req.user.user_id }, function (err, dig) {
+    if (req.body.dig_id) { // set the variables in mongoose for the dig
+        models.Dig.findOrCreate({ user_id: req.user.user_id }, function (err, dig) {
 
-        dig.user_id = req.user.user_id;
-        dig.dig_id = req.query.dig_id;      
+            // editing new user
+            if (!dig.dig_id) {
+                dig.user_id = req.user.user_id;
+                // arbitrary date that is too far back intentionally
+                dig.last_run = new Date("1998-07-12T16:00:00Z");
+            }
+    
+            dig.dig_id = req.body.dig_id;
 
-        // arbitrary date that is too far back intentionally
-        dig.last_run = new Date("1998-07-12T16:00:00Z");
+            service_util.add_service_to_user(service_name, req.user.user_id);
 
-
-        service_util.add_service_to_user(service_name,  req.user.user_id);
-
-        // saving user changes
-        dig.save(err, dig => {
-            if (err) return console.error(err);
+            // saving user changes
+            dig.save(err, dig => {
+                if (err) return console.error(err);
+            });
         });
-    });
 
-    res.redirect('/');
+        res.redirect('/');
+
+    }
+    else if (req.body.new_playlist_name) {
+        // user is creating a playlist
+
+        let dig_playlist_name = req.body.new_playlist_name;
+
+        let j = 0;
+
+        res.redirect('/');
+    }
+
+
+
 
 });
 

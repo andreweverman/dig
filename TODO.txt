@@ -20,9 +20,13 @@ TODO:
         need some jquery to get the services to hot reload every time
 
         add routes and views for edit and disable services
-    
+            edit service should list as primary the current dig playlist
 
 
 Working on currently: 
+
+    option to create the playlist for the user
+
+    routing to not need a FOOKin document.write
 
 
