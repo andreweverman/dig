@@ -11,7 +11,7 @@ var express = require('express'),
 const config = require(path.resolve("./config") + '/config.json');
 
 // connecting to the mongodb server
-mongoose.connect(config.MONGO_URL, { useNewUrlParser: true, useFindAndModify: true, useCreateIndex: true, useUnifiedTopology: true });
+mongoose.connect(config.MONGO_URL, { useNewUrlParser: true, useFindAndModify: true, useCreateIndex: true, useUnifiedTopology: true }).then(console.log("Connected to mongodb")).catch(err => console.log("Error connecting to mongodb", err));
 
 
 var passport = passport_sp.passport;
