@@ -1,9 +1,11 @@
 body {
     background-color: #484B49;
+    color: whitesmoke;
 }
 
 .jumbotron {
     background-image: url(https://cdn.wallpapersafari.com/34/88/yTgRnO.jpg);
+    color: black;
 }
 
 .justify_left_jumbotron {
@@ -20,6 +22,39 @@ body {
     text-align: center;
 }
 
-.card{
+.card {
     margin-top: 1em;
+}
+
+div.dig {
+    text-align: center;
+}
+
+.dig_description {
+    display: inline-block;
+    text-align: left;
+}
+
+#submit_dig {
+    margin-top: 1em;
+}
+
+#submit_dug {
+    margin-top: 1em;
+}
+
+.playlist_options {
+    margin: 1em;
+}
+
+
+
+ul.existing_playlists {
+    width: max-content;
+    margin: auto;
+    padding-top: 1em;
+}
+
+button.playlist_item {
+    text-align: left;
 }

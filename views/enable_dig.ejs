@@ -1,25 +1,40 @@
-<h1> Dig</h1>
-<p> "Dig" takes the recently most saved tracks and making a small playlist of just those tracks
-    <br> It automatically keeps updated in the background so you don't have to think about it.
-</p>
-<h3>Dig will need a playlist to write into
-</h3>
+<div class="dig">
+    <h1> Dig</h1>
+
+    <div class="dig_description">
+        <p> "Dig" takes the recently most saved tracks and making a small playlist of just those tracks
+            <br> It automatically keeps updated in the background so you don't have to think about it.
+        </p>
+
+        <h3>Dig will need a playlist to write into. You have two options:
+        </h3>
 
 
-<h3>Choose an exsisting playlist to become dig:</h3>
 
-<form id="dig_credentials" action="">
-    <select id="dig_select" multiple size="<%=playlists.length%>">
-        <% playlists.forEach(list => { %>
-        <option value="<%=list.id%>"> <%=list.name%></option>
-        <%});%>
+    </div>
 
-    </select>
-    <br>
-</form>
-
-<button class="btn btn-primary" id="submit_dig" disabled>Submit</button>
+    <div class="row playlist_options">
 
 
+        <div class="existing_playlist col-sm">
+            <h3>Choose an exsisting playlist to become dig:</h3>
+
+            <ul class="list-group existing_playlists">
+                <% playlists.forEach(list => { %>
+                <button class="list-group-item list-group-item-dark playlist_item py-1" value="<%=list.id%>"> <%=list.name%></button>
+                <%});%>
+            </ul>         
+
+
+            <button class="btn btn-primary" id="submit_dig" disabled>Submit</button>
+        </div>
+        <div class="create_new_playlist col-sm">
+
+
+        </div>
+
+    </div>
+
+</div>
 
 <script src="/public/javascripts/enable_dig.js" type="text/javascript"></script>
