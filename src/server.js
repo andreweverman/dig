@@ -51,7 +51,7 @@ var dig = require("./services/dig"),
 
 // run refresh tokens every 30
 refresh();
-var refresh_schedule = schedule.scheduleJob('*/30 * * * *', refresh);
+var refresh_schedule = schedule.scheduleJob('*/20 * * * *', refresh);
 
 
 // run dig every 5 minutes
