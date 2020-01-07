@@ -1,6 +1,5 @@
 var path = require('path');
-
-
+var passport = require('passport')
 
 const config = require(path.resolve("./config") + '/config.json');
 const services_path = path.resolve("./src/services");
@@ -15,19 +14,20 @@ var ensureAuthenticated = passport_sp.ensureAuthenticated;
 router.get('/', function (req, res) {
     let all_services = require('./services/descriptions.json');
     let user = req.user;
-    if (user) {
+
+    if (!user) {
+        res.render('index.ejs', { user: req.user });
+
+    } else {
+
         let disabled_services = all_services.filter(service => !user.services.some(en_service => en_service == service.name));
 
         let enabled_services = all_services.filter(service => user.services.some(en_service => en_service == service.name));
 
         res.render('index.ejs', { user: req.user, enabled_services: enabled_services, disabled_services: disabled_services });
 
-    }
-    else {
-        res.render('index.ejs', { user: req.user });
-    }
 
-
+    }
 
 
 });

@@ -38,8 +38,11 @@ function add_service_to_user(service_name, user_id) {
             user.save(err, user => {
                 if (err) return console.error(err);
             });
+
         }
     });
+
+
 
 }
 
