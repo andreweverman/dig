@@ -59,14 +59,12 @@ $("#create_playlist_text").change(function check() {
 
 });
 
+
+// disabling of button if no text. can get around without this
 $("#create_playlist_submit").hover(function check() {
-
-
     let empty = ($("#create_playlist_text").val() == '');
 
     $(this).prop("disabled", empty);
-
-
 });
 
 

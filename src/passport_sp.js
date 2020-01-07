@@ -15,8 +15,14 @@ passport.serializeUser(function (user, done) {
     done(null, user);
 });
 
-passport.deserializeUser(function (obj, done) {
-    done(null, obj);
+passport.deserializeUser(function (user, done) {
+    // so that it updates the user every time we change page !
+    models.User.findOrCreate({ user_id: user.user_id }, function (err, user) {
+        done(null, user);
+    });
+
+
+
 });
 
 passport.use(

@@ -148,13 +148,11 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             let remove_uris = remove_tracks.map(track => { return { uri: track.track.uri } });
 
             this.spotify_api.removeTracksFromPlaylist(this.dig_id, remove_uris).then(function (data) {
-                console.log('[', service_name, ']: Successful trim!');
+                console.log('[' + service_name + ']: Successful trim!');
             }, function (err) {
-                console.log('[', service_name, ']: Error trimming tracks for user: ' + dig.user_id, err);
+                console.log('[' + service_name + ']: Error trimming tracks for user: ' + dig.user_id, err);
             });
-
         }
-
     }
 
     /*
@@ -221,7 +219,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
 
 
         }, function (err) {
-            console.log('[', service_name, ']: Error adding tracks for user: ' + dig.user_id, err);
+            console.log('[' + service_name + ']: Error adding tracks for user: ' + dig.user_id, err);
         });
 
 
@@ -281,9 +279,19 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             this.dig_tracks = result[1].body.items;
 
             this.dig();
-            console.log("[", service_name, "]:\t\tDig finished for user: ", this.user_id);
+            console.log("[" + service_name + "]:\t\tDig finished for user: " + this.user_id);
         }).catch(error => {
-            console.error("[", service_name, "]:\t\tError getting info from spotify ", error)
+            if (error.message == "Not Found") {
+                console.log("[" + service_name + "]:\t\t" + " Playlist was not found for user: " + this.user_id)
+                console.log("[" + service_name + "]:\t\t", "Deleting this Dig");
+
+                models.Dig.deleteOne({ user_id: this.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t\t", "Deleted") })
+            }
+            else {
+                console.error("[" + service_name + "]:\t\tError getting info from spotify " + error);
+
+            }
+
         });
     }
 }

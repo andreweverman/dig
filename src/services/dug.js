@@ -107,7 +107,7 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
             });
 
         }, function (err) {
-            console.log('[',service_name,']: Error adding tracks for user: ' + dug.user_id, err);
+            console.log('['+service_name+']: Error adding tracks for user: ' + dug.user_id, err);
         });
 
 
@@ -161,9 +161,9 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
             this.dug_tracks = result[1].body.items;
 
             this.dug();
-            console.log("[",service_name,"]:\t\tDug finished for user: ", this.user_id);
+            console.log("["+ service_name+ "]:\t\tDug finished for user: ", this.user_id);
         }).catch(error => {
-            console.error("[",service_name,"]:\t\tError getting info from spotify ", error)
+            console.error("["+ service_name+ "]:\t\tError getting info from spotify ", error)
         });
 
 

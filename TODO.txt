@@ -27,6 +27,6 @@ Working on currently:
 
     option to create the playlist for the user
 
-    routing to not need a FOOKin document.write
+    spread the routing to not need a FOOKin document.write to all
 
 

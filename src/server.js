@@ -6,6 +6,7 @@ var express = require('express'),
   schedule = require('node-schedule'),
   path = require("path"),
   bodyParser = require('body-parser');
+ 
 
 
 // < - - - - - - SERVER SETUP - - - - - - >
@@ -19,6 +20,7 @@ var passport = passport_sp.passport;
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }))
+
 app.set('views', path.resolve("./views"));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
