@@ -2,15 +2,15 @@
 
 // submitting dig. extra check for if there is something selected
 $('#submit_dig').click(
-    function submit() {
+    function submit_existing() {
 
         let val = $(".existing_playlists").find('.list-group-item-success')
         let dig_id = val[0].value
         if (dig_id != "") {
             $.ajax({
-                url: '/enable_dig?dig_id='+dig_id,
-                type: 'PUT',                
-                data: {dig_id: dig_id},
+                url: '/enable_dig/existing_playlist',
+                type: 'PUT',
+                data: { dig_id: dig_id },
                 success: function (response) {
                     console.log("Success putting")
                     window.location.href = "/";
@@ -21,19 +21,40 @@ $('#submit_dig').click(
                     window.location.href = "/";
                 }
             });
-       
-
-            // $.post( "/enable_dig", { dig_id: dig_id} , function(data){
-            //     window.location.href = "/";
-            // });
-
-
 
         }
     }
 
 );
 
+// submitting dig. extra check for if there is something selected
+$('#create_playlist_submit').click(
+    function submit_new() {
+
+        let new_playlist_name = $("#create_playlist_text").val();
+
+        if (new_playlist_name != "") {
+
+            $.ajax({
+                url: '/enable_dig/new_playlist',
+                type: 'PUT',
+                data: { new_playlist_name: new_playlist_name },
+                success: function (response) {
+                    console.log("Success putting")
+                    window.location.href = "/";
+                }
+                ,
+                error: function (request, msg, error) {
+                    console.log("Error putting", error);
+                    window.location.href = "/";
+                }
+            });
+
+
+        }
+    }
+
+);
 
 // this is for the selecting of the playlist element
 $('.playlist_item').click(function change() {

@@ -33,7 +33,7 @@ function run_dig() {
             models.User.findOne({ user_id: member.user_id }).exec(function (err, user) {
                 if (err) throw err;
 
-                if (user) { new Dig(member.user_id, member.dig_id, member.last_run, user.access_token, user, digs) }
+                if (user) { new Dig(member.user_id, member.username,  member.dig_id, member.last_run, user.access_token, user, digs) }
 
             });
         });
@@ -59,9 +59,10 @@ TODO * @param {mongoose}    user_db         The mongoose object for the user
 TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      * @return {int}    The difference in days
      */
-    constructor(user_id, dig_id, last_run, access_token, user_db, dig_db) {
+    constructor(user_id, username, dig_id, last_run, access_token, user_db, dig_db) {
         // setting needed variables
         this.user_id = user_id;
+        this.username = username;
         this.dig_id = dig_id;
         this.access_token = access_token;
         this.last_run = last_run;
@@ -272,20 +273,48 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
                 limit: 50,
                 offset: 0
             }),
-            this.spotify_api.getPlaylistTracks(this.dig_id)
+            this.spotify_api.getPlaylistTracks(this.dig_id),
+            this.spotify_api.getUserPlaylists(this.username)
         ]).then(result => {
 
             this.saved_tracks = result[0].body.items;
             this.dig_tracks = result[1].body.items;
+            this.user_playlists = result[2].body.items;
 
-            this.dig();
-            console.log("[" + service_name + "]:\t\tDig finished for user: " + this.user_id);
+            // checking for if the dig playlist is not really in the user's playlists;
+            if (this.user_playlists.some(playlist => playlist.id == this.dig_id)) {
+                this.dig();
+                console.log("[" + service_name + "]:\t\tDig finished for user: " + this.user_id);
+            }
+            else {
+                console.log("[" + service_name + "]:\t\t" + " Playlist was not found for user: " + this.user_id)
+                console.log("[" + service_name + "]:\t\t", "Deleting this Dig");
+
+                // delete from digs
+                models.Dig.deleteOne({ user_id: this.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t\t", "Deleted") });
+                // delete from user's services
+                models.User.findOne({ user_id: this.user_id }).exec((err, user) => {
+             
+                    user.services = user.services.filter(service => service != service_name);
+                    user.save(err, user => { if (err) return console.error(err); });
+                });
+            }
+
+
         }).catch(error => {
             if (error.message == "Not Found") {
                 console.log("[" + service_name + "]:\t\t" + " Playlist was not found for user: " + this.user_id)
                 console.log("[" + service_name + "]:\t\t", "Deleting this Dig");
 
-                models.Dig.deleteOne({ user_id: this.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t\t", "Deleted") })
+                // delete from digs
+                models.Dig.deleteOne({ user_id: this.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t\t", "Deleted") });
+                // delete from user's services
+                models.Dig.findOne({ user_id: this.user_id }).exec((err, user) => {
+        
+                    user.services = user.services.filter(service => service != service_name);
+                    user.save(err, user => { if (err) return console.error(err); });
+                });
+
             }
             else {
                 console.error("[" + service_name + "]:\t\tError getting info from spotify " + error);

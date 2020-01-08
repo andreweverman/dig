@@ -5,7 +5,8 @@ var express = require('express'),
   mongoose = require('mongoose'),
   schedule = require('node-schedule'),
   path = require("path"),
-  bodyParser = require('body-parser');
+  bodyParser = require('body-parser'),
+  helmet = require('helmet');
  
 
 
@@ -19,7 +20,8 @@ mongoose.connect(config.MONGO_URL, { useNewUrlParser: true, useFindAndModify: tr
 var passport = passport_sp.passport;
 
 var app = express();
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(helmet());
 
 app.set('views', path.resolve("./views"));
 app.set('view engine', 'ejs');
@@ -42,6 +44,8 @@ app.use('/', require(path.resolve('./routes/login')));
 app.use('/enable_dig', require(path.resolve('./routes/services/enable_dig.js')));
 
 app.use('/enable_dug', require(path.resolve('./routes/services/enable_dug.js')));
+
+app.use('/remove_dig', require(path.resolve('./routes/services/disable_dig.js')))
 
 
 // \ - - - - - -  EDN MY ROUTES - - - - - - /
