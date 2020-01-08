@@ -17,6 +17,8 @@ TODO:
         
     views:
 
+        disable service button working
+
         need some jquery to get the services to hot reload every time
 
         add routes and views for edit and disable services
@@ -25,9 +27,11 @@ TODO:
 
 Working on currently: 
 
+    only show playlists that we own in enable_dig
+
     use put request instead of post.
 
-    dig put put params
+    disable service button
 
     spread the routing to not need a FOOKin document.write to all
 
