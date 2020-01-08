@@ -7,12 +7,27 @@ $('#submit_dig').click(
         let val = $(".existing_playlists").find('.list-group-item-success')
         let dig_id = val[0].value
         if (dig_id != "") {
-            $.post( "/enable_dig", { dig_id: dig_id} , function(data){
-                window.location.href = "/";
+            $.ajax({
+                url: '/enable_dig?dig_id='+dig_id,
+                type: 'PUT',                
+                data: {dig_id: dig_id},
+                success: function (response) {
+                    console.log("Success putting")
+                    window.location.href = "/";
+                }
+                ,
+                error: function (request, msg, error) {
+                    console.log("Error putting", error);
+                    window.location.href = "/";
+                }
             });
-            
-            
-            // location.assign('/enable_dig/valid?dig_id=' + dig_id);
+       
+
+            // $.post( "/enable_dig", { dig_id: dig_id} , function(data){
+            //     window.location.href = "/";
+            // });
+
+
 
         }
     }
@@ -66,5 +81,4 @@ $("#create_playlist_submit").hover(function check() {
 
     $(this).prop("disabled", empty);
 });
-
 
