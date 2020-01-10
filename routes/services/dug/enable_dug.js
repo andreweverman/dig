@@ -21,36 +21,90 @@ router.get('/', ensureAuthenticated, function (req, res) {
     spotify_api.setAccessToken(req.user.access_token);
     spotify_api.getUserPlaylists(req.user.username)
         .then(function (data) {
-            playlists = data.body.items;
-            res.render('services/dug/enable_dug.ejs', { user: req.user, playlists: playlists });
+            // need to filter out only the playlists that the users own
+            // item[0].owner.id  
+            let playlists = data.body.items;
+            let editable_playlists = playlists.filter((playlist) => {
+                let z = playlist.owner.id;
+                return playlist.owner.id == req.user.user_id
+            });
+
+            res.render('services/dug/enable_dug.ejs', { user: req.user, playlists: editable_playlists });
         }, function (err) {
             console.log('Something went wrong!', err);
         });
 
 });
 
-router.get('/valid', ensureAuthenticated, function (req, res) {
+// handles the enabling of dug. only good input can get to this point
+router.put('/existing_playlist', ensureAuthenticated, function (req, res) {
+    let user = req.user;
 
-    // set the variables in mongoose for the dig and optional master
-    models.Dug.findOrCreate({ user_id: req.user.user_id }, function (err, dug) {
+    if (req.body.dug_id) { // set the variables in mongoose for the dug
+        models.Dug.findOrCreate({ user_id: user.user_id }, function (err, dug) {
 
-        dug.user_id = req.user.user_id;       
-        dug.dug_id = req.query.dug_id;
+            // editing new user
+            if (!dug.dug_id) {
+                dug.user_id = user.user_id;
+                // arbitrary date that is too far back intentionally
+                dug.last_run = new Date("1998-07-12T16:00:00Z");
+            }
 
-        // arbitrary date that is too far back intentionally
-        dug.last_run = new Date("1998-07-12T16:00:00Z");
+            dug.dug_id = req.body.dug_id;
 
-        service_util.add_service_to_user(service_name, req.user.user_id);
+            service_util.add_service_to_user(service_name, user.user_id);
 
-        // saving user changes
-        dug.save(err, dig => {
-            if (err) return console.error(err);
+            // saving user changes
+            dug.save(err, dug => {
+                if (err) return console.error(err);
+
+            });
+            res.redirect(200, '/');
         });
-    });
 
-    res.redirect('/');
+    }
 
 });
+
+
+// handles the enabling of dug. only good input can get to this point
+router.put('/new_playlist', ensureAuthenticated, function (req, res) {
+
+    // user is creating a playlist
+    let user = req.user;
+    let dug_playlist_name = req.body.new_playlist_name;
+
+    let spotify_api = new spotify_web_api(config);
+    spotify_api.setAccessToken(req.user.access_token);
+
+    spotify_api.createPlaylist(user.user_id, dug_playlist_name, { 'description': "Playlist created to hold all saved tracks. ", 'public': false, 'collaborative': false }).then(data => {
+
+        // need to add to dug db
+
+        models.Dig.findOrCreate({ user_id: user.user_id }, function (err, dug) {
+
+            // editing new user
+            if (!dug.dug_id) {
+                dug.user_id = user.user_id;
+                // arbitrary date that is too far back intentionally
+                dug.last_run = new Date("1998-07-12T16:00:00Z");
+            }
+
+            dug.dug_id = data.body.id;
+
+            service_util.add_service_to_user(service_name, user.user_id);
+
+            // saving user changes
+            dug.save(err, dug => {
+                if (err) return console.error(err);
+            });
+
+            res.redirect(200, '/');
+        });
+    });
+});
+
+
 
 
 module.exports = router;

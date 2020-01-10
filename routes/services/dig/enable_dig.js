@@ -21,8 +21,15 @@ router.get('/', ensureAuthenticated, function (req, res) {
     spotify_api.setAccessToken(req.user.access_token);
     spotify_api.getUserPlaylists(req.user.username)
         .then(function (data) {
-            playlists = data.body.items;
-            res.render('services/dig/enable_dig.ejs', { user: req.user, playlists: playlists });
+            // need to filter out only the playlists that the users own
+            // item[0].owner.id  
+            let playlists = data.body.items;
+            let editable_playlists = playlists.filter((playlist) => {
+                let z = playlist.owner.id;
+                return playlist.owner.id == req.user.user_id
+            });
+
+            res.render('services/dig/enable_dig.ejs', { user: req.user, playlists: editable_playlists });
         }, function (err) {
             console.log('Something went wrong!', err);
         });
@@ -73,7 +80,7 @@ router.put('/new_playlist', ensureAuthenticated, function (req, res) {
     spotify_api.createPlaylist(user.user_id, dig_playlist_name, { 'description': "Playlist created to hold recently saved tracks. ", 'public': false, 'collaborative': false }).then(data => {
 
         // need to add to dig db
-     
+
         models.Dig.findOrCreate({ user_id: user.user_id }, function (err, dig) {
 
             // editing new user
@@ -92,15 +99,9 @@ router.put('/new_playlist', ensureAuthenticated, function (req, res) {
                 if (err) return console.error(err);
             });
 
-            res.redirect(200,'/');
+            res.redirect(200, '/');
         });
     });
-
-   
-
-
-
-
 });
 
 
