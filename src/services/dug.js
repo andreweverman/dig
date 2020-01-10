@@ -32,7 +32,7 @@ function run_dug() {
             models.User.findOne({ user_id: member.user_id }).exec(function (err, user) {
                 if (err) throw err;
 
-                if (user){new Dug(member.user_id, member.dug_id, member.last_run, user.access_token, user, dugs);}
+                if (user) { new Dug(member.user_id, member.dug_id, member.last_run, user.access_token, user, dugs); }
 
             });
         });
@@ -103,11 +103,11 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
                 user.save(err, user => {
                     if (err) return console.error(err);
                 });
-               
+
             });
 
         }, function (err) {
-            console.log('['+service_name+']: Error adding tracks for user: ' + dug.user_id, err);
+            console.log('[' + service_name + ']: Error adding tracks for user: ' + dug.user_id, err);
         });
 
 
@@ -136,6 +136,16 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
             }
         }
 
+        // just a double check on adding
+        let dug_track_uris = this.dug_tracks.map(track => track.track.uri);
+
+        for (let i = 0; i < new_tracks.length; i++) {
+            let current_track = new_tracks[i];
+            if (dug_track_uris.includes(current_track)) {
+                new_tracks.splice(i, 1);
+            }
+        }
+
         return new_tracks;
     }
 
@@ -161,9 +171,9 @@ TODO * @param {mongoose}    dug_db          The mongoose object for the dig
             this.dug_tracks = result[1].body.items;
 
             this.dug();
-            console.log("["+ service_name+ "]:\t\tDug finished for user: ", this.user_id);
+            console.log("[" + service_name + "]:\t\tDug finished for user: ", this.user_id);
         }).catch(error => {
-            console.error("["+ service_name+ "]:\t\tError getting info from spotify ", error)
+            console.error("[" + service_name + "]:\t\tError getting info from spotify ", error)
         });
 
 

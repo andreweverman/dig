@@ -16,7 +16,7 @@ router.get('/', function (req, res) {
     let user = req.user;
 
     if (!user) {
-        res.render('index.ejs', { user: req.user });
+        res.render('basic/index.ejs', { user: req.user });
 
     } else {
 
@@ -24,7 +24,7 @@ router.get('/', function (req, res) {
 
         let enabled_services = all_services.filter(service => user.services.some(en_service => en_service == service.name));
 
-        res.render('index.ejs', { user: req.user, enabled_services: enabled_services, disabled_services: disabled_services });
+        res.render('basic/index.ejs', { user: req.user, enabled_services: enabled_services, disabled_services: disabled_services });
 
 
     }
@@ -33,11 +33,11 @@ router.get('/', function (req, res) {
 });
 
 router.get('/login', function (req, res) {
-    res.render('login.ejs', { user: req.user });
+    res.render('basic/login.ejs', { user: req.user });
 });
 
 router.get('/account', ensureAuthenticated, function (req, res) {
-    res.render('account.ejs', { user: req.user });
+    res.render('basic/account.ejs', { user: req.user });
 });
 
 router.get('/logout', function (req, res) {
