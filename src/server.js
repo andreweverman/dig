@@ -45,7 +45,7 @@ app.use('/enable_dig', require(path.resolve('./routes/services/dig/enable_dig.js
 
 app.use('/enable_dug', require(path.resolve('./routes/services/dug/enable_dug.js')));
 
-app.use('/remove_dig', require(path.resolve('./routes/services/dig/disable_dig.js')))
+app.use('/disable_dig', require(path.resolve('./routes/services/dig/disable_dig.js')))
 
 
 // \ - - - - - -  EDN MY ROUTES - - - - - - /

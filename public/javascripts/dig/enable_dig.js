@@ -1,5 +1,3 @@
-
-
 // submitting dig. extra check for if there is something selected
 $('#submit_dig').click(
     function submit_existing() {
@@ -14,8 +12,8 @@ $('#submit_dig').click(
                 success: function (response) {
                     console.log("Success putting")
                     window.location.href = "/";
-                }
-                ,
+
+                },
                 error: function (request, msg, error) {
                     console.log("Error putting", error);
                     window.location.href = "/";

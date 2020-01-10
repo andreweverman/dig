@@ -72,7 +72,8 @@
                 <p class="card-text"><%=service.description%></p>
                 <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Edit
                     <%=service.name%></a>
-                <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-danger">Disable <%=service.name%></a>
+                <button id="/disable_<%=service.name.toLowerCase()%>" class="btn btn-danger disable_service"> Disable
+                    <%=service.name%></button>
             </div>
         </div>
 
