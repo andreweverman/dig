@@ -4,7 +4,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var models = require(path.resolve('./models/dig_db'))(mongoose);
 
-var service_util = require('./service_util');
+var service_util = require('../service_util');
 var ensureAuthenticated = service_util.ensureAuthenticated;
 var service_name = "Dig";
 
@@ -22,4 +22,8 @@ router.delete('/', ensureAuthenticated, function (req, res) {
         user.services = user.services.filter(service => service != service_name);
         user.save(err, user => { if (err) return console.error(err); });
     });
-})
+});
+
+
+
+module.exports= router;

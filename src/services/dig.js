@@ -33,7 +33,7 @@ function run_dig() {
             models.User.findOne({ user_id: member.user_id }).exec(function (err, user) {
                 if (err) throw err;
 
-                if (user) { new Dig(member.user_id, member.username,  member.dig_id, member.last_run, user.access_token, user, digs) }
+                if (user) { new Dig(member.user_id, member.username, member.dig_id, member.last_run, user.access_token, user, digs) }
 
             });
         });
@@ -195,6 +195,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
         var new_saved_tracks = this.new_saved_tracks();
         var dig = this;
 
+        if (new_saved_tracks.length == 0) return;
 
         this.spotify_api.addTracksToPlaylist(this.dig_id, new_saved_tracks, { position: 0 }).then(function (data) {
 
@@ -257,6 +258,16 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             }
         }
 
+        // just a double check on adding
+        let dig_track_uris = this.dig_tracks.map(track => track.track.uri);
+
+        for (let i = 0; i < new_tracks.length; i++) {
+            let current_track = new_tracks[i];
+            if (dig_track_uris.includes(current_track)) {
+                new_tracks.splice(i, 1);
+            }
+        }
+
         return new_tracks;
     }
 
@@ -294,7 +305,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
                 models.Dig.deleteOne({ user_id: this.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t\t", "Deleted") });
                 // delete from user's services
                 models.User.findOne({ user_id: this.user_id }).exec((err, user) => {
-             
+
                     user.services = user.services.filter(service => service != service_name);
                     user.save(err, user => { if (err) return console.error(err); });
                 });
@@ -310,7 +321,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
                 models.Dig.deleteOne({ user_id: this.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t\t", "Deleted") });
                 // delete from user's services
                 models.Dig.findOne({ user_id: this.user_id }).exec((err, user) => {
-        
+
                     user.services = user.services.filter(service => service != service_name);
                     user.save(err, user => { if (err) return console.error(err); });
                 });

@@ -4,7 +4,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var models = require(path.resolve('./models/dig_db'))(mongoose);
 
-var service_util = require('./service_util');
+var service_util = require('../service_util');
 var ensureAuthenticated = service_util.ensureAuthenticated;
 var service_name = "Dig";
 
@@ -22,7 +22,7 @@ router.get('/', ensureAuthenticated, function (req, res) {
     spotify_api.getUserPlaylists(req.user.username)
         .then(function (data) {
             playlists = data.body.items;
-            res.render('enable_dig.ejs', { user: req.user, playlists: playlists });
+            res.render('services/dig/enable_dig.ejs', { user: req.user, playlists: playlists });
         }, function (err) {
             console.log('Something went wrong!', err);
         });
