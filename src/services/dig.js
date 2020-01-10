@@ -147,11 +147,12 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
 
             let remove_tracks = stale_tracks.slice(0, this.dig_tracks.length - length_min);
             let remove_uris = remove_tracks.map(track => { return { uri: track.track.uri } });
-
+            console.log('[' + service_name + ']: I think I should trim trim!');
+            console.log('[' + service_name + ']: Tracks '+ stale_tracks.toString());
             this.spotify_api.removeTracksFromPlaylist(this.dig_id, remove_uris).then(function (data) {
-                console.log('[' + service_name + ']: Successful trim!');
+                console.log('[' + service_name + ']:\t\tSuccessful trim!');
             }, function (err) {
-                console.log('[' + service_name + ']: Error trimming tracks for user: ' + dig.user_id, err);
+                console.log('[' + service_name + ']:\t\tError trimming tracks for user: ' + dig.user_id, err);
             });
         }
     }
@@ -289,6 +290,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
         ]).then(result => {
 
             this.saved_tracks = result[0].body.items;
+            this.dig_full = result[1].body;
             this.dig_tracks = result[1].body.items;
             this.user_playlists = result[2].body.items;
 
