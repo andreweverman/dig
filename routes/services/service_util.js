@@ -15,7 +15,6 @@ var spotify_web_api = require('spotify-web-api-node');
 var mongoose = require('mongoose');
 var models = require('../../models/dig_db')(mongoose);
 
-
 /*  
  * Adds current service to the user's profile.
  *
@@ -25,7 +24,6 @@ var models = require('../../models/dig_db')(mongoose);
  * @param {string}  service_name     the name of the service we will be adding into the db
  */
 function add_service_to_user(service_name, user_id) {
-
 
     models.User.findOrCreate({ user_id: user_id }, function (err, user) {
         let in_services = user.services.includes(service_name)
@@ -42,8 +40,6 @@ function add_service_to_user(service_name, user_id) {
         }
     });
 
-
-
 }
 
 
@@ -57,9 +53,6 @@ function ensureAuthenticated(req, res, next) {
 
 
 module.exports = {
-
     add_service_to_user: add_service_to_user,
     ensureAuthenticated: ensureAuthenticated
-
-
 }

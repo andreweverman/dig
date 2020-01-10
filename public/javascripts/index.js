@@ -7,7 +7,6 @@ $(".disable_service").click(
                 url: disable_url,
                 type: 'DELETE',
                 success: function (response) {
-
                     window.location.reload(true);
                 },
                 error: function (request, msg, error) {

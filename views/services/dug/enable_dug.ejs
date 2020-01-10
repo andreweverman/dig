@@ -1,25 +1,38 @@
-<h1> Dug</h1>
-<p> "Dug" is a playlist that holds all of your saved tracks for easy access. 
-    <br> It automatically keeps updated in the background so you don't have to think about it.
-</p>
-<h3>Dug will need a playlist to write into
-</h3>
+<div class="dug">
+    <h1> Dug</h1>
+
+    <div class="dug_description">
+        <p> "Dug" is a way to quickly find a collection of all of your saved tracks.
+            <br> It automatically keeps updated in the background so you don't have to think about it.
+        </p>
+
+        <h3>Dug will need a playlist to write into. You have two options:
+        </h3>
+    </div>
+
+    <div class="row playlist_options">
 
 
-<h3>Choose an exsisting playlist to become dug:</h3>
+        <div class="existing_playlist col-sm">
+            <h3>Choose an exsisting playlist to become dug:</h3>
 
-<form id="dug_credentials" action="">
-    <select id="dug_select" multiple size="<%=playlists.length%>">
-        <% playlists.forEach(list => { %>
-        <option value="<%=list.id%>"> <%=list.name%></option>
-        <%});%>
-
-    </select>
-    <br>
-</form>
+            <ul class="list-group existing_playlists">
+                <% playlists.forEach(list => { %>
+                <button class="list-group-item list-group-item-dark playlist_item py-1" value="<%=list.id%>">
+                    <%=list.name%></button>
+                <%});%>
+            </ul>
 
 
-<button class="btn btn-primary" id="submit_dug" disabled>Submit</button>
+            <button class="btn btn-primary" id="submit_dug" disabled>Submit</button>
+        </div>
+        <div class="create_new_playlist col-sm">
+            <h3>Create new playlist:</h3>
+            <input type="text" class="create_playlist" id="create_playlist_text" placeholder="dug"><br>
+            <button class="btn btn-primary" id="create_playlist_submit" disabled>Create Playlist</button>
+        </div>
 
+    </div>
+</div>
 
 <script src="/public/javascripts/dug/enable_dug.js" type="text/javascript"></script>
