@@ -1,12 +1,12 @@
 <div class="service">
-    <h1> Dug</h1>
+    <h1>Catalog</h1>
 
-    <div class="service_description">
-        <p> "Dug" is a way to quickly find a collection of all of your saved tracks.
+    <div class="catalog_description">
+        <p> "Catalog" is an archive of all of your discover weekly playlits.
             <br> It automatically keeps updated in the background so you don't have to think about it.
         </p>
 
-        <h3>Dug will need a playlist to write into. You have two options:
+        <h3>Catalog will need a playlist to write into. You have two options:
         </h3>
     </div>
 
@@ -14,25 +14,25 @@
 
 
         <div class="existing_playlist col-sm">
-            <h3>Choose an exsisting playlist to become dug:</h3>
+            <h3>Choose an exsisting playlist to become catalog:</h3>
 
             <ul class="list-group existing_playlists">
-                <% playlists.forEach(list => { %>
+                <%playlists.forEach(list => { %>
                 <button class="list-group-item list-group-item-dark playlist_item py-1" value="<%=list.id%>">
                     <%=list.name%></button>
                 <%});%>
             </ul>
 
 
-            <button class="btn btn-primary" id="submit_dug" disabled>Submit</button>
+            <button class="btn btn-primary" id="submit_catalog" disabled>Submit</button>
         </div>
         <div class="create_new_playlist col-sm">
             <h3>Create new playlist:</h3>
-            <input type="text" class="create_playlist" id="create_playlist_text" placeholder="dug"><br>
+            <input type="text" class="create_playlist" id="create_playlist_text" placeholder="catalog"><br>
             <button class="btn btn-primary" id="create_playlist_submit" disabled>Create Playlist</button>
         </div>
 
     </div>
 </div>
 
-<script src="/public/javascripts/dug/enable_dug.js" type="text/javascript"></script>
+<script src="/public/javascripts/catalog/enable_catalog.js" type="text/javascript"></script>

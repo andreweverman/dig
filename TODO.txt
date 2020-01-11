@@ -2,29 +2,24 @@ TODO:
 
     services:
         add the album save all tracks functionality as own service
-
         add discover weekly catalog as own service
         add order dig as optional service param on dig
-        able to remove services
 
-        dig: 
+      ~ dig: 
             make it to where I dont have to relookup thingsfrom the db
-
-        dig + dig:
-            option to create the playlist for the user
-    
 
         
     views:
     
-        add routes and views for edit and disable services
-            edit service should list as primary the current dig playlist
+        ~ add routes and views for edit and disable services
+        ~    edit service should list as primary the current dig playlist
+
+    other:
+        can probably make the public javascripts all one and make better variable names
 
 
 Working on currently: 
 
-    use put request instead of post.
-
-    spread the routing to not need a FOOKin document.write to all
+    add discover weekly catalog as own service
 
 
