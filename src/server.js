@@ -7,7 +7,7 @@ var express = require('express'),
   path = require("path"),
   bodyParser = require('body-parser'),
   helmet = require('helmet');
- 
+
 
 
 // < - - - - - - SERVER SETUP - - - - - - >
@@ -52,9 +52,9 @@ app.use('/services', require(path.resolve('./routes/services/util/service_router
 
 // ! - - - - - - SERVICES SCHEDULES - - - - - - !
 var dig = require("./services/dig"),
-  dug = require('./services/dug')
-refresh = require('./refresh'),
-catalog  = require('./services/catalog');
+  dug = require('./services/dug'),
+  catalog = require('./services/catalog'),
+  refresh = require('./refresh');
 
 // run refresh tokens every 30
 refresh();
@@ -69,9 +69,9 @@ var dig_schedule = schedule.scheduleJob('*/5 * * * *', dig);
 dug();
 var dug_schedule = schedule.scheduleJob('*/5 * * * *', dug);
 
-//TODO : not run catalog every 5 minutes
-dug();
-var catalog_schedule = schedule.scheduleJob('*/5 * * * *', catalog);
+// catAlog
+var catalog_schedule = schedule.scheduleJob('00 13 * * 0', catalog);
+var catalog_schedule = schedule.scheduleJob('00 13 * * 1', catalog);
 
 
 
