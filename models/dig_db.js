@@ -43,7 +43,8 @@ module.exports = function (mongoose) {
     var Catalog = new mongoose.Schema({
       user_id: { type: String, index: true, unique: true },  
       catalog_id: String,
-      last_run: Date
+      dw_id: String,
+      initial_run: Boolean
 
     });
     Catalog.plugin(findorcreate);

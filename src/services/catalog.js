@@ -33,7 +33,7 @@ function run_catalog() {
             models.User.findOne({ user_id: member.user_id }).exec(function (err, user) {
                 if (err) throw err;
 
-                if (user) { new Catalog(member.user_id, member.username, member.dig_id, member.last_run, user.access_token, user, catalogs) }
+                if (user) { new Catalog(member.user_id, member.username, member.catalog_id, member.dw_id, member.initial_run, user.access_token, user, catalogs) }
 
             });
         });
@@ -59,13 +59,14 @@ TODO * @param {mongoose}    user_db         The mongoose object for the user
 TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      * @return {int}    The difference in days
      */
-    constructor(user_id, username, catalog_id, last_run, access_token, user_db, dig_db) {
+    constructor(user_id, username, catalog_id, dw_id, initial_run, access_token, user_db, dig_db) {
         // setting needed variables
         this.user_id = user_id;
         this.username = username;
         this.catalog_id = catalog_id;
+        this.dw_id = dw_id;
         this.access_token = access_token;
-        this.last_run = last_run;
+        this.initial_run = initial_run;
 
         this.user_db = user_db;
         this.dig_db = dig_db;
@@ -89,7 +90,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      */
     catalog() {
 
-        this.check_run() ? this.add_dig() : this.trim_tracks();
+        this.check_run() ? this.add_tracks() : undefined
 
     }
 
@@ -106,84 +107,12 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      */
     check_run() {
         // going to check if the first song in the 
-        return this.last_run < new Date(this.saved_tracks[0].added_at) || this.dig_tracks.length == 0;
+        let run = !this.initial_run;
+        let is_monday = (new Date()).getDay() == 1;
+
+        return run || is_monday;
     }
 
-    /*  
-     * Gets the difference between current time and @track_added
-     *
-     * Difference is the amount of days they are different. Absolute value. 
-     * 
-     * @param {Object}  track_added     the date object for the track that we are comparing against
-     * 
-     * @return {int}    The difference in days
-     */
-    diff(track_added) {
-        const oneDay = 24 * 60 * 60 * 1000;
-
-        let current_time = new Date();
-
-        return Math.round(Math.abs((current_time - track_added) / oneDay));
-
-    }
-
-
-    /*
-     * Removes tracks from dig that are stale.
-     *
-     * Looks for the tracks that are ready to be removed.
-     * By default it will remove any track that has been in the playlist for a week,
-     * but it won't remove to be less than 20 tracks total.
-     *  
-
-     */
-    trim_tracks() {
-        var dig = this;
-        let length_min = 20;
-
-        // this.dig_tracks is the most current dig iteration
-        let stale_tracks = this.tracks_past_date();
-
-        if (stale_tracks.length != 0 && this.dig_tracks.length > length_min) {
-
-            let remove_tracks = stale_tracks.slice(0, this.dig_tracks.length - length_min);
-            let remove_uris = remove_tracks.map(track => { return { uri: track.track.uri } });
-            console.log('[' + service_name + ']: I think I should trim trim!');
-            console.log('[' + service_name + ']: Tracks ' + remove_uris.toString());
-            this.spotify_api.removeTracksFromPlaylist(this.dig_id, remove_uris).then(function (data) {
-                console.log('[' + service_name + ']:\tSuccessful trim!');
-            }, function (err) {
-                console.log('[' + service_name + ']:\tError trimming tracks for user: ' + dig.user_id, err);
-            });
-        }
-    }
-
-    /*
-     * Gets the tracks that are past due date. 
-     *
-     * Gives an array for the tracks that are past due date. Right now time limit is set for a week,
-     * but we could make that an optional parameter at some poing
-     * 
-     * @return {Array} Array of track uris that are the tracks that are past due date
-     */
-    tracks_past_date() {
-        let expiration = 7;
-        let stale_tracks = [];
-
-        // sorts the oldest to the front
-        let old_first_dig_tracks = this.dig_tracks;
-        old_first_dig_tracks.forEach((track, i) => track.order = i);
-        old_first_dig_tracks.sort((a, b) => (a.added_at > b.added_at) ? 1 : (a.order > b.order) ? -1 : 1)
-
-        old_first_dig_tracks.forEach(track => {
-            let time_diff = this.diff(new Date(track.added_at))
-            if (time_diff > expiration) {
-                stale_tracks.push(track)
-            }
-        });
-
-        return stale_tracks;
-    }
 
     /*
      * Adds tracks from dig that have been recently saved.
@@ -191,38 +120,40 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      * Adds all recently saved tracks by the user to the this.dig_id playlist
      * 
      */
-    add_dig() {
+    add_tracks() {
 
         var new_saved_tracks = this.new_saved_tracks();
-        var dig = this;
+        var catalog = this;
 
-        if (new_saved_tracks.length == 0) return;
+        this.spotify_api.addTracksToPlaylist(this.catalog_id, new_saved_tracks).then(function (data) {
 
-        this.spotify_api.addTracksToPlaylist(this.dig_id, new_saved_tracks, { position: 0 }).then(function (data) {
+            if (!catalog.initial_run) {
+            //     update that we have initialized the playlist
+                models.Catalog.findOne({ user_id: catalog.user_id }).exec(function (err, catalog_db) {
+                    if (err) throw err;
 
-            // we will write that we ran dig at this point. most important thing is that the tracks were added. 
-            models.Catalog.findOne({ user_id: dig.user_id }).exec(function (err, user) {
-                if (err) throw err;
+                    catalog_db.initial_run = true
 
-                user.last_run = new Date();
-                user.save(err, user => {
-                    if (err) return console.error(err);
+
+                    catalog_db.save(err, user => {
+                        if (err) return console.error(err);
+                    });
                 });
 
-                // adding the tracks onto the dig.dig_tracks so i can skip a call to spotify. !!
-                let new_tracks = dig.saved_tracks.slice(0, new_saved_tracks.length)
-                dig.dig_tracks = new_tracks.concat(dig.dig_tracks);
-
-
-
-                // now that the tracks have been updated, time to trim. 
-                dig.trim_tracks();            });
-
-
+            }
 
         }, function (err) {
-            console.log('[' + service_name + ']: Error adding tracks for user: ' + dig.user_id, err);
+            console.log('[' + service_name + ']: Error adding tracks for user: ' + catalog.user_id, err);
         });
+
+    }
+
+
+    new_saved_tracks() {
+
+        let tracks = this.dw_tracks;
+
+        return tracks.map(track => track.track.uri)
 
     }
 
@@ -236,58 +167,23 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
     get_necessary() {
 
         Promise.all([
-            this.spotify_api.getMySavedTracks({
-                limit: 50,
-                offset: 0
-            }),
-            this.spotify_api.getPlaylistTracks(this.dig_id),
-            this.spotify_api.getUserPlaylists(this.user_id)
+
+            this.spotify_api.getPlaylistTracks(this.catalog_id),
+
+            this.spotify_api.getPlaylistTracks(this.dw_id)
+
         ]).then(result => {
 
-            this.saved_tracks = result[0].body.items;
-            this.dig_full = result[1].body;
-            this.dig_tracks = result[1].body.items;
-            this.user_playlists = result[2].body.items;
+            this.catalog_tracks = result[0].body.items;
+            this.dw_tracks = result[1].body.items;
 
-            // checking for if the dig playlist is not really in the user's playlists;
-            if (this.user_playlists.some(playlist => playlist.id == this.dig_id)) {
-                this.dig();
-                console.log("[" + service_name + "]:\tCatalog finished for user: " + this.user_id);
-            }
-            else {
-                console.log("[" + service_name + "]:\t" + " Playlist was not found for user: " + this.user_id)
-                console.log("[" + service_name + "]:\t", "Deleting this Catalog");
+            this.catalog();
 
-                // delete from digs
-                models.Catalog.deleteOne({ user_id: this.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t", "Deleted") });
-                // delete from user's services
-                models.User.findOne({ user_id: this.user_id }).exec((err, user) => {
 
-                    user.services = user.services.filter(service => service != service_name);
-                    user.save(err, user => { if (err) return console.error(err); });
-                });
-            }
 
 
         }).catch(error => {
-            if (error.message == "Not Found") {
-                console.log("[" + service_name + "]:\t" + " Playlist was not found for user: " + this.user_id)
-                console.log("[" + service_name + "]:\t", "Deleting this Catalog");
 
-                // delete from digs
-                models.Catalog.deleteOne({ user_id: this.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t", "Deleted") });
-                // delete from user's services
-                models.Catalog.findOne({ user_id: this.user_id }).exec((err, user) => {
-
-                    user.services = user.services.filter(service => service != service_name);
-                    user.save(err, user => { if (err) return console.error(err); });
-                });
-
-            }
-            else {
-                console.error("[" + service_name + "]:\tError getting info from spotify " + error);
-
-            }
 
         });
     }

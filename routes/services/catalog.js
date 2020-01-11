@@ -19,7 +19,7 @@ router.get('/enable', ensureAuthenticated, function (req, res) {
     let spotify_api = new spotify_web_api(config);
 
     spotify_api.setAccessToken(req.user.access_token);
-    spotify_api.getUserPlaylists(req.user.username)
+    spotify_api.getUserPlaylists(req.user.user_id)
         .then(function (data) {
             // need to filter out only the playlists that the users own
             // item[0].owner.id  
@@ -40,27 +40,40 @@ router.get('/enable', ensureAuthenticated, function (req, res) {
 router.put('/enable/existing_playlist', ensureAuthenticated, function (req, res) {
     let user = req.user;
 
+    let spotify_api = new spotify_web_api(config);
+
+
     if (req.body.catalog_id) { // set the variables in mongoose for the catalog
-        models.Catalog.findOrCreate({ user_id: user.user_id }, function (err, catalog) {
 
-            // editing new user
-            if (!catalog.catalog_id) {
-                catalog.user_id = user.user_id;
-                // arbitrary date that is too far back intentionally
-                catalog.last_run = new Date("1998-07-12T16:00:00Z");
-            }
 
-            catalog.catalog_id = req.body.catalog_id;
+        spotify_api.getUserPlaylists(user.user_id)
+            .then(function (data) {
+                let dw_id = extract_dw(data);
 
-            service_util.add_service_to_user(service_name, user.user_id);
+                models.Catalog.findOrCreate({ user_id: user.user_id }, function (err, catalog) {
 
-            // saving user changes
-            catalog.save(err, catalog => {
-                if (err) return console.error(err);
+                    // editing new user
+                    if (!catalog.catalog_id) {
+                        catalog.user_id = user.user_id;
+                        // arbitrary date that is too far back intentionally
+                        catalog.initial_run = false;
+                    }
+                    catalog.dw_id = dw_id;
+                    catalog.catalog_id = req.body.catalog_id;
 
-            });
-            res.redirect(200, '/');
-        });
+                    service_util.add_service_to_user(service_name, user.user_id);
+
+                    // saving user changes
+                    catalog.save(err, catalog => {
+                        if (err) return console.error(err);
+
+                    });
+                    res.redirect(200, '/');
+                });
+
+            }, function (err) {
+                console.log('Something went wrong!', err);
+            }).catch(err => console.log(error));
 
     }
 
@@ -73,6 +86,7 @@ router.put('/enable/new_playlist', ensureAuthenticated, function (req, res) {
     // user is creating a playlist
     let user = req.user;
     let catalog_playlist_name = req.body.new_playlist_name;
+    let dw_id = get_dw_id(user);
 
     let spotify_api = new spotify_web_api(config);
     spotify_api.setAccessToken(req.user.access_token);
@@ -80,27 +94,32 @@ router.put('/enable/new_playlist', ensureAuthenticated, function (req, res) {
     spotify_api.createPlaylist(user.user_id, catalog_playlist_name, { 'description': "Playlist created to hold all saved tracks. ", 'public': false, 'collaborative': false }).then(data => {
 
         // need to add to dug db
+        spotify_api.getUserPlaylists(user.user_id)
+            .then(function (data) {
+                let dw_id = extract_dw(data);
 
-        models.Dig.findOrCreate({ user_id: user.user_id }, function (err, catalog) {
+                models.Dig.findOrCreate({ user_id: user.user_id }, function (err, catalog) {
 
-            // editing new user
-            if (!catalog.catalog_id) {
-                catalog.user_id = user.user_id;
-                // arbitrary date that is too far back intentionally
-                catalog.last_run = new Date("1998-07-12T16:00:00Z");
-            }
+                    // editing new user
+                    if (!catalog.catalog_id) {
+                        catalog.user_id = user.user_id;
+                        // arbitrary date that is too far back intentionally
+                        catalog.last_run = new Date("1998-07-12T16:00:00Z");
+                    }
 
-            catalog.catalog_id = data.body.id;
+                    catalog.dw_id = dw_id;
+                    catalog.catalog_id = data.body.id;
 
-            service_util.add_service_to_user(service_name, user.user_id);
+                    service_util.add_service_to_user(service_name, user.user_id);
 
-            // saving user changes
-            catalog.save(err, catalog => {
-                if (err) return console.error(err);
-            });
+                    // saving user changes
+                    catalog.save(err, catalog => {
+                        if (err) return console.error(err);
+                    });
 
-            res.redirect(200, '/');
-        });
+                    res.redirect(200, '/');
+                });
+            }).catch(err => console.log(error));
     });
 });
 
@@ -117,6 +136,47 @@ router.delete('/disable', ensureAuthenticated, function (req, res) {
         res.redirect(200, '/');
     });
 });
+
+
+function extract_dw(data) {
+
+    // need to filter out only the playlists that the users own
+    // item[0].owner.id  
+    let playlists = data.body.items;
+
+    let editable_playlists = playlists.filter((playlist) => {
+        return playlist.owner.id == "spotify" && playlist.name == "Discover Weekly"
+    })
+    if (editable_playlists.length > 0) {
+        return editable_playlists[0].id;
+    }
+
+}
+
+function get_dw_id(user) {
+    let spotify_api = new spotify_web_api(config);
+
+    spotify_api.getUserPlaylists(user.user_id)
+        .then(function (data) {
+            // need to filter out only the playlists that the users own
+            // item[0].owner.id  
+            let playlists = data.body.items;
+
+
+            let editable_playlists = playlists.filter((playlist) => {
+                return playlist.owner.id == "spotify" && playlist.name == "Discover Weekly"
+            });
+
+            if (editable_playlists.length > 0) {
+                return editable_playlists[0];
+            }
+
+        }, function (err) {
+            console.log('Something went wrong!', err);
+        });
+
+
+}
 
 
 module.exports = router;

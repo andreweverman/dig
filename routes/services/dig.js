@@ -19,7 +19,7 @@ router.get('/enable', ensureAuthenticated, function (req, res) {
     let spotify_api = new spotify_web_api(config);
 
     spotify_api.setAccessToken(req.user.access_token);
-    spotify_api.getUserPlaylists(req.user.username)
+    spotify_api.getUserPlaylists(req.user.user_id)
         .then(function (data) {
             // need to filter out only the playlists that the users own
             // item[0].owner.id  
