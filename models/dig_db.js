@@ -40,12 +40,21 @@ module.exports = function (mongoose) {
     });
     Dug.plugin(findorcreate);
 
+    var Catalog = new mongoose.Schema({
+      user_id: { type: String, index: true, unique: true },  
+      catalog_id: String,
+      last_run: Date
+
+    });
+    Catalog.plugin(findorcreate);
+
 
     // exporting
     models = {
       User: mongoose.model('User', User),
       Dig: mongoose.model('Dig', Dig),
-      Dug: mongoose.model('Dug', Dug)
+      Dug: mongoose.model('Dug', Dug),
+      Catalog: mongoose.model('Catalog',Catalog)
     }
   }
 

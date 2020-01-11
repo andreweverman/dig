@@ -29,24 +29,15 @@ div.services {
     margin: 1em;
 }
 
-div.dig {
+div.service {
     text-align: center;
-}
-
-.dig_description {
-    display: inline-block;
-    text-align: left;
 }
 
 #submit_dig {
     margin-top: 1em;
 }
 
-div.dug {
-    text-align: center;
-}
-
-.dug_description {
+.service_description {
     display: inline-block;
     text-align: left;
 }

@@ -53,7 +53,8 @@ app.use('/services', require(path.resolve('./routes/services/util/service_router
 // ! - - - - - - SERVICES SCHEDULES - - - - - - !
 var dig = require("./services/dig"),
   dug = require('./services/dug')
-refresh = require('./refresh');
+refresh = require('./refresh'),
+catalog  = require('./services/catalog');
 
 // run refresh tokens every 30
 refresh();
@@ -67,6 +68,10 @@ var dig_schedule = schedule.scheduleJob('*/5 * * * *', dig);
 // run dug every 5 minutes
 dug();
 var dug_schedule = schedule.scheduleJob('*/5 * * * *', dug);
+
+//TODO : not run catalog every 5 minutes
+dug();
+var catalog_schedule = schedule.scheduleJob('*/5 * * * *', catalog);
 
 
 
