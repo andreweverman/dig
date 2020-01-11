@@ -70,10 +70,8 @@ dug();
 var dug_schedule = schedule.scheduleJob('*/5 * * * *', dug);
 
 // catAlog
-var catalog_schedule = schedule.scheduleJob('00 13 * * 0', catalog);
-var catalog_schedule = schedule.scheduleJob('00 13 * * 1', catalog);
-
-
+var catalog_schedule_sunday = schedule.scheduleJob('00 13 * * 0', catalog);
+var catalog_schedule_monday = schedule.scheduleJob('00 13 * * 1', catalog);
 
 // ! - - - - - - EDN SERVICES SCHEDULES - - - - - - !
 
