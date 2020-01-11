@@ -148,7 +148,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             let remove_tracks = stale_tracks.slice(0, this.dig_tracks.length - length_min);
             let remove_uris = remove_tracks.map(track => { return { uri: track.track.uri } });
             console.log('[' + service_name + ']: I think I should trim trim!');
-            console.log('[' + service_name + ']: Tracks '+ stale_tracks.toString());
+            console.log('[' + service_name + ']: Tracks ' + remove_uris.toString());
             this.spotify_api.removeTracksFromPlaylist(this.dig_id, remove_uris).then(function (data) {
                 console.log('[' + service_name + ']:\t\tSuccessful trim!');
             }, function (err) {
@@ -182,7 +182,6 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
         });
 
         return stale_tracks;
-
     }
 
     /*
@@ -225,7 +224,6 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
             console.log('[' + service_name + ']: Error adding tracks for user: ' + dig.user_id, err);
         });
 
-
     }
 
     /*
@@ -237,35 +235,20 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
      * @return {String} An array of the track uri's that need to be saved.     
      */
     new_saved_tracks() {
-
-        let new_tracks = []
-
-        if (this.dig_tracks.length != 0) {
-            for (let i = 0; i < this.saved_tracks.length; i++) {
-                let track = this.saved_tracks[i]
-
-                if (this.last_run > new Date(track.added_at)) {
-                    break;
-                }
-                else {
-                    new_tracks.push(track.track.uri)
-                }
-            }
-        }
-        else {
-            for (let i = 0; i < 20; i++) {
-                let track = this.saved_tracks[i];
-                new_tracks.push(track.track.uri);
-            }
-        }
-
-        // just a double check on adding
+        let time_thresh = 7;
+        let new_tracks = [];
         let dig_track_uris = this.dig_tracks.map(track => track.track.uri);
 
-        for (let i = 0; i < new_tracks.length; i++) {
-            let current_track = new_tracks[i];
-            if (dig_track_uris.includes(current_track)) {
-                new_tracks.splice(i, 1);
+
+        for (let i = 0; i < this.saved_tracks.length; i++) {
+            let track = this.saved_tracks[i];
+            let diff = this.diff(new Date(track.added_at));
+
+            if (diff > time_thresh || dig_track_uris.includes(track.track.uri)) {
+                return new_tracks;
+            }
+            else {
+                new_tracks.push(track.track.uri)
             }
         }
 
@@ -286,7 +269,7 @@ TODO * @param {mongoose}    dig_db          The mongoose object for the dig
                 offset: 0
             }),
             this.spotify_api.getPlaylistTracks(this.dig_id),
-            this.spotify_api.getUserPlaylists(this.username)
+            this.spotify_api.getUserPlaylists(this.user_id)
         ]).then(result => {
 
             this.saved_tracks = result[0].body.items;

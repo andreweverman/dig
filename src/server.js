@@ -41,13 +41,8 @@ app.use('/', require(path.resolve("./routes/basic")));
 
 app.use('/', require(path.resolve('./routes/login')));
 
-app.use('/enable_dig', require(path.resolve('./routes/services/dig/enable_dig.js')));
+app.use('/services', require(path.resolve('./routes/services/util/service_router.js')));
 
-app.use('/enable_dug', require(path.resolve('./routes/services/dug/enable_dug.js')));
-
-app.use('/disable_dig', require(path.resolve('./routes/services/dig/disable_dig.js')));
-
-app.use('/disable_dug', require(path.resolve('./routes/services/dug/disable_dug.js')));
 
 
 // \ - - - - - -  EDN MY ROUTES - - - - - - /
