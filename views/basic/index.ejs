@@ -30,16 +30,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 <!-- signed in -->
 <%} else{ %>
 
@@ -70,9 +60,9 @@
                         <div class="card-body">
                             <h5 class="card-title"><%=service.name%></h5>
                 <p class="card-text"><%=service.description%></p>
-                <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Edit
+                <a href="/services/<%=service.name.toLowerCase()%>/enable" class="btn btn-primary">Edit
                     <%=service.name%></a>
-                <button id="/disable_<%=service.name.toLowerCase()%>" class="btn btn-danger disable_service"> Disable
+                <button id="/services/<%=service.name.toLowerCase()%>/disable" class="btn btn-danger disable_service"> Disable
                     <%=service.name%></button>
             </div>
         </div>
@@ -107,7 +97,7 @@
                         <div class="card-body">
                             <h5 class="card-title"><%=service.name%></h5>
         <p class="card-text"><%=service.description%></p>
-        <a href="/enable_<%=service.name.toLowerCase()%>" class="btn btn-primary">Enable
+        <a href="/services/<%=service.name.toLowerCase()%>/enable" class="btn btn-primary">Enable
             <%=service.name%></a>
 
     </div>

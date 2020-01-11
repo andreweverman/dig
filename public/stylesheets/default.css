@@ -3,7 +3,7 @@ body {
     color: whitesmoke;
 }
 
-.jumbotron { 
+.jumbotron {
     color: black;
 }
 
@@ -22,11 +22,10 @@ body {
 }
 
 .card {
-  
     margin: 1em;
 }
 
-div.services{
+div.services {
     margin: 1em;
 }
 
@@ -43,6 +42,15 @@ div.dig {
     margin-top: 1em;
 }
 
+div.dug {
+    text-align: center;
+}
+
+.dug_description {
+    display: inline-block;
+    text-align: left;
+}
+
 #submit_dug {
     margin-top: 1em;
 }
@@ -50,8 +58,6 @@ div.dig {
 .playlist_options {
     margin: 1em;
 }
-
-
 
 ul.existing_playlists {
     width: max-content;
@@ -62,5 +68,3 @@ ul.existing_playlists {
 button.playlist_item {
     text-align: left;
 }
-
-

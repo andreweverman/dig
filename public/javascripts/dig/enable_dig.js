@@ -6,7 +6,7 @@ $('#submit_dig').click(
         let dig_id = val[0].value
         if (dig_id != "") {
             $.ajax({
-                url: '/enable_dig/existing_playlist',
+                url: '/services/dig/enable/existing_playlist',
                 type: 'PUT',
                 data: { dig_id: dig_id },
                 success: function (response) {
@@ -34,7 +34,7 @@ $('#create_playlist_submit').click(
         if (new_playlist_name != "") {
 
             $.ajax({
-                url: '/enable_dig/new_playlist',
+                url: '/services/dig/enable/new_playlist',
                 type: 'PUT',
                 data: { new_playlist_name: new_playlist_name },
                 success: function (response) {
@@ -85,8 +85,6 @@ $("#create_playlist_text").change(function check() {
 
     let enabled = !($("#create_playlist_submit").prop("disabled"));
     let empty = ($(this).val() == '');
-    let val = true;
-
 
     $("#create_playlist_submit").prop("disabled", enabled && empty);
 

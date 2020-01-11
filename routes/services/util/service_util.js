@@ -13,7 +13,7 @@ var path = require("path");
 const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
 var mongoose = require('mongoose');
-var models = require('../../models/dig_db')(mongoose);
+var models = require(path.resolve('./models/dig_db'))(mongoose);
 
 /*  
  * Adds current service to the user's profile.

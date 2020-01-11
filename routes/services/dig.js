@@ -4,7 +4,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var models = require(path.resolve('./models/dig_db'))(mongoose);
 
-var service_util = require('../service_util');
+var service_util = require('./util/service_util');
 var ensureAuthenticated = service_util.ensureAuthenticated;
 var service_name = "Dig";
 
@@ -13,7 +13,7 @@ const config = require(path.resolve("./config") + '/config.json');
 var spotify_web_api = require('spotify-web-api-node');
 
 
-router.get('/', ensureAuthenticated, function (req, res) {
+router.get('/enable', ensureAuthenticated, function (req, res) {
 
     let playlists = "";
     let spotify_api = new spotify_web_api(config);
@@ -37,7 +37,7 @@ router.get('/', ensureAuthenticated, function (req, res) {
 });
 
 // handles the enabling of dig. only good input can get to this point
-router.put('/existing_playlist', ensureAuthenticated, function (req, res) {
+router.put('/enable/existing_playlist', ensureAuthenticated, function (req, res) {
     let user = req.user;
 
     if (req.body.dig_id) { // set the variables in mongoose for the dig
@@ -68,7 +68,7 @@ router.put('/existing_playlist', ensureAuthenticated, function (req, res) {
 
 
 // handles the enabling of dig. only good input can get to this point
-router.put('/new_playlist', ensureAuthenticated, function (req, res) {
+router.put('/enable/new_playlist', ensureAuthenticated, function (req, res) {
 
     // user is creating a playlist
     let user = req.user;
@@ -105,6 +105,18 @@ router.put('/new_playlist', ensureAuthenticated, function (req, res) {
 });
 
 
+router.delete('/disable', ensureAuthenticated, function (req, res) {
+    let user = req.user;
+    // delete from digs
+    models.Dig.deleteOne({ user_id: user.user_id }, err => { err ? console.log("Error deleting") : console.log("[" + service_name + "]:\t\t", "Deleted") });
+    // delete from user's services
+    models.User.findOne({ user_id: user.user_id }).exec((err, user) => {
+
+        user.services = user.services.filter(service => service != service_name);
+        user.save(err, user => { if (err) return console.error(err); });
+        res.redirect(200, '/');
+    });
+});
 
 
 module.exports = router;
