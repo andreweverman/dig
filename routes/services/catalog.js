@@ -62,7 +62,7 @@ router.put('/enable/existing_playlist', ensureAuthenticated, function (req, res)
                     catalog.catalog_id = req.body.catalog_id;
 
                     service_util.add_service_to_user(service_name, user.user_id);
-
+ 
                     // saving user changes
                     catalog.save(err, catalog => {
                         if (err) return console.error(err);

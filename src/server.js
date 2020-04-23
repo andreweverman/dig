@@ -54,7 +54,8 @@ app.use('/services', require(path.resolve('./routes/services/util/service_router
 var dig = require("./services/dig"),
   dug = require('./services/dug'),
   catalog = require('./services/catalog'),
-  refresh = require('./refresh');
+  refresh = require('./refresh'),
+  album_save_tracks = require('./services/album_save_tracks');
 
 // run refresh tokens every 30
 refresh();
@@ -72,6 +73,10 @@ var dug_schedule = schedule.scheduleJob('*/5 * * * *', dug);
 // catAlog
 var catalog_schedule_sunday = schedule.scheduleJob('00 13 * * 0', catalog);
 var catalog_schedule_monday = schedule.scheduleJob('00 13 * * 1', catalog);
+
+// album_save tracks
+album_save_tracks()
+var catalog_schedule_monday = schedule.scheduleJob('4,9,14,19,24,29,34,39,44,49,54,59 * * * *',album_save_tracks);
 
 // ! - - - - - - EDN SERVICES SCHEDULES - - - - - - !
 
