@@ -20,9 +20,9 @@ router.get('/', function (req, res) {
 
     } else {
 
-        let disabled_services = all_services.filter(service => !user.services.some(en_service => en_service == service.name));
+        let disabled_services = all_services.filter(service => !user.services.some(en_service => en_service == service.db_name));
 
-        let enabled_services = all_services.filter(service => user.services.some(en_service => en_service == service.name));
+        let enabled_services = all_services.filter(service => user.services.some(en_service => en_service == service.db_name));
 
         res.render('basic/index.ejs', { user: req.user, enabled_services: enabled_services, disabled_services: disabled_services });
 

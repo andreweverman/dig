@@ -1,4 +1,4 @@
-var path  = require("path");
+var path = require("path");
 const config = require(path.resolve("./config") + '/config.json');
 const mongoose = require('mongoose');
 var findorcreate = require('mongoose-findorcreate');
@@ -26,14 +26,14 @@ module.exports = function (mongoose) {
 
     var Dig = new mongoose.Schema({
       user_id: { type: String, index: true, unique: true },
-      dig_id: String,    
+      dig_id: String,
       last_run: Date
 
     });
     Dig.plugin(findorcreate);
 
     var Dug = new mongoose.Schema({
-      user_id: { type: String, index: true, unique: true },  
+      user_id: { type: String, index: true, unique: true },
       dug_id: String,
       last_run: Date
 
@@ -41,7 +41,7 @@ module.exports = function (mongoose) {
     Dug.plugin(findorcreate);
 
     var Catalog = new mongoose.Schema({
-      user_id: { type: String, index: true, unique: true },  
+      user_id: { type: String, index: true, unique: true },
       catalog_id: String,
       dw_id: String,
       initial_run: Boolean
@@ -49,13 +49,22 @@ module.exports = function (mongoose) {
     });
     Catalog.plugin(findorcreate);
 
+    var AlbumSaveTracks = new mongoose.Schema({
+      user_id: { type: String, index: true, unique: true },
+      enabled: Boolean, last_run: Date
+
+
+    });
+    AlbumSaveTracks.plugin(findorcreate);
+
 
     // exporting
     models = {
       User: mongoose.model('User', User),
       Dig: mongoose.model('Dig', Dig),
       Dug: mongoose.model('Dug', Dug),
-      Catalog: mongoose.model('Catalog',Catalog)
+      Catalog: mongoose.model('Catalog', Catalog),
+      AlbumSaveTracks: mongoose.model('AlbumSaveTracks', AlbumSaveTracks)
     }
   }
 

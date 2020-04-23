@@ -1,0 +1,44 @@
+<div class="service">
+    <h1>Album Save Tracks</h1>
+
+    <div class="album_save_tracks_description">
+        <h3> Enabling will save each track in an album when you save the album.
+
+        </h3>
+        <br>
+
+    </div>
+
+    <input id='album_save_enabled' type="checkbox" <% if (currently_enabled){
+        %> checked<% } %> data-toggle="toggle">
+
+</div>
+
+
+
+<script>
+    $(function () {
+
+
+        $('#album_save_enabled').change(function () {
+
+
+            $.ajax({
+                url: '/services/album_save_tracks/enable/change',
+                type: 'PUT',
+                data: { enabled: $(this).prop('checked') },
+                success: function (response) {
+                    console.log("Success putting")
+                    window.location.href = "/";
+
+                },
+                error: function (request, msg, error) {
+                    console.log("Error putting", error);
+                    window.location.href = "/";
+                }
+            });
+        })
+    })
+
+
+</script>

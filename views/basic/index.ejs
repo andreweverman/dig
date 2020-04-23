@@ -60,55 +60,69 @@
                         <div class="card-body">
                             <h5 class="card-title"><%=service.name%></h5>
                 <p class="card-text"><%=service.description%></p>
-                <a href="/services/<%=service.name.toLowerCase()%>/enable" class="btn btn-primary">Edit
+
+                <%if (service.type == "redirect"){%>
+
+                <a href="/services/<%=service.redirect_ext%>/enable" class="btn btn-primary">Edit
                     <%=service.name%></a>
-                <button id="/services/<%=service.name.toLowerCase()%>/disable" class="btn btn-danger disable_service"> Disable
+                <button id="/services/<%=service.redirect_ext%>/disable" class="btn btn-danger disable_service"> Disable
                     <%=service.name%></button>
+                <% } else if (service.type == "toggle"){ %>
+                <button id="/services/<%=service.redirect_ext%>/toggle" class="btn btn-danger toggle_service"> Disable
+                    <%=service.name%></button>
+                <%}%>
+
             </div>
         </div>
 
     </div>
     <% });%>
-</div>
-</div>
+            </div>
+        </div>
 
 
 
 
-<hr>
+        <hr>
 
-<h3> Available Services: </h3>
+        <h3> Available Services: </h3>
 
-<div class="disbled_services">
+        <div class="disbled_services">
 
-    <div class="row justify-content-md-center">
+            <div class="row justify-content-md-center">
 
 
-        <%disabled_services.forEach( (service, disabled_service_count) => { %>
+                <%disabled_services.forEach( (service, disabled_service_count) => { %>
 
-        <% if (disabled_service_count % 3 ==0 && disabled_service_count != 0) { %>
-    </div>
-    <div class="row justify-content-md-center">
+                <% if (disabled_service_count % 3 ==0 && disabled_service_count != 0) { %>
+            </div>
+            <div class="row justify-content-md-center">
 
-        <%}%>
+                <%}%>
                 <div class="col col-lg-2">
                     <div class="card bg-info" style="max-width: 18rem;">
 
                         <div class="card-body">
                             <h5 class="card-title"><%=service.name%></h5>
-        <p class="card-text"><%=service.description%></p>
-        <a href="/services/<%=service.name.toLowerCase()%>/enable" class="btn btn-primary">Enable
-            <%=service.name%></a>
+
+                <%if (service.type == "redirect"){%>
+                <p class="card-text"><%=service.description%></p>
+                <a href="/services/<%=service.redirect_ext%>/enable" class="btn btn-primary">Enable
+                    <%=service.name%></a>
+                <% } else if (service.type== "toggle"){ %>
+                <button id="/services/<%=service.redirect_ext%>/toggle" class="btn btn-danger toggle_service"> Enable
+                    <%=service.name%></button>
+                <%}%>
+
+            </div>
+        </div>
 
     </div>
-</div>
 
-</div>
-
-<% });%>
-</div>
-</div>
-</div>
+    <% });%>
+            </div>
+        </div>
+    </div>
 </div>
 
 
