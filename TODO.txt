@@ -1,8 +1,8 @@
 TODO: 
 
     services:
-        add the album save all tracks functionality as own service
-        add discover weekly catalog as own service
+        
+        
         add order dig as optional service param on dig
 
       ~ dig: 
@@ -20,6 +20,6 @@ TODO:
 
 Working on currently: 
 
-    add discover weekly catalog as own service
+    
 
 
