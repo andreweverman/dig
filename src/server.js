@@ -1,4 +1,4 @@
-var express = require('express'),
+const express = require('express'),
   session = require('express-session'),
   passport_sp = require('./passport_sp'),
   expressLayouts = require('express-ejs-layouts'),
@@ -6,7 +6,9 @@ var express = require('express'),
   schedule = require('node-schedule'),
   path = require("path"),
   bodyParser = require('body-parser'),
-  helmet = require('helmet');
+  helmet = require('helmet'),
+  https = require('https');
+  
 
 
 
@@ -81,4 +83,5 @@ var catalog_schedule_monday = schedule.scheduleJob('4,9,14,19,24,29,34,39,44,49,
 // ! - - - - - - EDN SERVICES SCHEDULES - - - - - - !
 
 
-app.listen(8080);
+app.listen(config.PORT,config.IP);
+// http.createServer(app).listen(config.PORT,config.IP);
