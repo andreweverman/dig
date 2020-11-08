@@ -3,12 +3,11 @@
 // Also use for exporting the ensureAuthenticated function for the other routes
 
 
-var path = require('path');
-var mongoose = require('mongoose');
-const config = require(path.resolve("./config") + '/config.json');
-var passport = require('passport'),
-    SpotifyStrategy = require('passport-spotify').Strategy;
+import * as mongose from 'mongoose';
+import * as passport from 'passport';
+import {Strategy} from 'passport-spotify'; 
 
+import * as User from './models/User';
 var models = require(path.resolve('./models/dig_db'))(mongoose);
 
 passport.serializeUser(function (user, done) {
@@ -26,7 +25,7 @@ passport.deserializeUser(function (user, done) {
 });
 
 passport.use(
-    new SpotifyStrategy(
+    new Strategy(
         config,
         function (access_token, refresh_token, expires_in, profile, done) {
             // asynchronous verification, for effect...
