@@ -1,7 +1,6 @@
 var path = require('path');
 var passport = require('passport')
 
-const config = require(path.resolve("./config") + '/config.json');
 const services_path = path.resolve("./src/services");
 
 
