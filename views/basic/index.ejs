@@ -1,0 +1,156 @@
+<!-- not signed in -->
+
+<% if (!user) {%>
+
+
+    <div class="jumbotron horizontal-center vertical-center ">
+        <div class="text-center">
+            <h1 class="display-4">Welcome to Dig</h1>
+            <p class="lead">Dig helps you organize your Spotify playlists.</p>
+            <hr class="my-4">
+        </div>
+
+        <div class="justify_left_jumbotron">
+            <h3 class="services">Current services: </h3>
+            <ul class="list-group">
+                <% serviceDescriptions.forEach(service=> { %>
+
+                    <li class="list-group-item">
+                        <%=service%>
+                    </li>
+                    <% }) %>
+
+            </ul>
+
+
+        </div>
+
+        <div class="text-center">
+            <a class="btn btn-primary btn-lg" href="/auth/spotify" role="button" id="login">Login</a>
+        </div>
+
+
+    </div>
+
+
+
+    <!-- signed in -->
+    <%} else{ %>
+
+        <div class="signed_in_container">
+            <h2>Hello, <%= user.displayName%>.</h2>
+
+            <div class="services">
+
+                <h3> Your Services: </h3>
+
+                <div class="enabledServices">
+
+                    <div class="row justify-content-md-center">
+
+                        <%enabledServices.forEach( (service, enabledServiceCount)=> { %>
+
+                            <% if (enabledServiceCount % 3==0 && enabledServiceCount !=0) { %>
+                    </div>
+
+                    <div class="row justify-content-md-center">
+
+                        <%}%>
+
+                            <div class="col col-lg-2">
+                                <div class="card bg-success" style="max-width: 18rem;">
+
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <%=service.name%>
+                                        </h5>
+                                        <p class="card-text">
+                                            <%=service.description%>
+                                        </p>
+
+                                        <%if (service.type=="redirect" ){%>
+
+                                            <a href="/services/<%=service.serviceRoute%>/enable"
+                                                class="btn btn-primary">Edit
+                                                <%=service.name%>
+                                            </a>
+                                            <button id="/services/<%=service.serviceRoute%>/disable"
+                                                class="btn btn-danger disable_service"> Disable
+                                                <%=service.name%>
+                                            </button>
+                                            <% } else if (service.type=="toggle" ){ %>
+                                                <button id="/services/<%=service.serviceRoute%>/toggle"
+                                                    class="btn btn-danger toggle_service"> Disable
+                                                    <%=service.name%>
+                                                </button>
+                                                <%}%>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <% });%>
+                    </div>
+                </div>
+
+
+
+
+                <hr>
+
+                <h3> Available Services: </h3>
+
+                <div class="disabledServices">
+
+                    <div class="row justify-content-md-center">
+
+
+                        <%disabledServices.forEach( (service, disabledServiceCount)=> { %>
+
+                            <% if (disabledServiceCount % 3==0 && disabledServiceCount !=0) { %>
+                    </div>
+                    <div class="row justify-content-md-center">
+
+                        <%}%>
+                            <div class="col col-lg-2">
+                                <div class="card bg-info" style="max-width: 18rem;">
+
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <%=service.name%>
+                                        </h5>
+
+                                        <%if (service.type=="redirect" ){%>
+                                            <p class="card-text">
+                                                <%=service.description%>
+                                            </p>
+                                            <a href="/services/<%=service.serviceRoute%>/enable"
+                                                class="btn btn-primary">Enable
+                                                <%=service.name%>
+                                            </a>
+                                            <% } else if (service.type=="toggle" ){ %>
+                                                <button id="/services/<%=service.serviceRoute%>/toggle"
+                                                    class="btn btn-danger toggle_service"> Enable
+                                                    <%=service.name%>
+                                                </button>
+                                                <%}%>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <% });%>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        </div>
+
+
+        <script src="/public/javascripts/index.js" type="text/javascript"></script>
+
+
+        <% } %>

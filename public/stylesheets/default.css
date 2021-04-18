@@ -1,0 +1,70 @@
+body {
+    background-color: #484b49;
+    color: whitesmoke;
+}
+
+.jumbotron {
+    color: black;
+}
+
+.justify_left_jumbotron {
+    width: 50%;
+    margin: 0 auto;
+}
+
+#login {
+    margin-top: 1em;
+}
+
+.signed_in_container {
+    color: whitesmoke;
+    text-align: center;
+}
+
+.card {
+    margin: 1em;
+}
+
+div.services {
+    margin: 1em;
+}
+
+div.service {
+    text-align: center;
+}
+
+#submit_dig {
+    margin-top: 1em;
+}
+
+.service_description {
+    display: inline-block;
+    text-align: left;
+}
+
+#submit_dug {
+    margin-top: 1em;
+}
+
+.playlist_options {
+    margin: 1em;
+}
+
+ul.existing_playlists {
+    width: max-content;
+    margin: auto;
+    padding-top: 1em;
+}
+
+button.playlist_item {
+    text-align: left;
+}
+
+div.enabledServices button,
+div.enabledServices a {
+    margin-top: 0.5em;
+}
+
+.playlist_button{
+    margin-top: 0.5em;
+}
