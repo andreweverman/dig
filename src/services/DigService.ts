@@ -14,8 +14,7 @@ class Dig extends Service {
     serviceRoute = 'dig'
     databaseCollection = 'dig'
     databaseModel = Digs
-    // runSchedule = '*/5 * * * *'
-    runSchedule = '* * * * *'
+    runSchedule = '*/5 * * * *'
     selectPlaylist = true
     extraConfig = true
     extraConfigPath = '../services/dig/config.ejs'
