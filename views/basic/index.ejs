@@ -10,8 +10,9 @@
             <hr class="my-4">
         </div>
 
-        <div class="justify_left_jumbotron">
-            <h3 class="services">Current services: </h3>
+
+        <div class="col-md-6 mx-auto">
+            <h3 class="services text-center">Current services</h3>
             <ul class="list-group">
                 <% serviceDescriptions.forEach(service=> { %>
 
@@ -22,27 +23,23 @@
 
             </ul>
 
-
         </div>
 
         <div class="text-center">
-            <a class="btn btn-primary btn-lg" href="/auth/spotify" role="button" id="login">Login</a>
+            <a class="btn btn-primary btn-lg mt-3 " href="/auth/spotify" role="button" id="login">Login</a>
         </div>
 
-
     </div>
-
-
 
     <!-- signed in -->
     <%} else{ %>
 
-        <div class="signed_in_container">
-            <h2>Hello, <%= user.displayName%>.</h2>
+        <div class="signed_in_container container-fluid">
+            <h2 class="row justify-content-md-center">Hello, <%= user.displayName%>.</h2>
 
             <div class="services">
 
-                <h3> Your Services: </h3>
+                <h3 class="row justify-content-md-center mt-4"> Your Services: </h3>
 
                 <div class="enabledServices">
 
@@ -58,30 +55,30 @@
                         <%}%>
 
                             <div class="col col-lg-2">
-                                <div class="card bg-success" style="max-width: 18rem;">
+                                <div class="card bg-success my-3" style="max-width: 18rem;">
 
-                                    <div class="card-body">
+                                    <div class="card-body text-center">
                                         <h5 class="card-title">
                                             <%=service.name%>
                                         </h5>
-                                        <p class="card-text">
+                                        <p class="card-text text-left">
                                             <%=service.description%>
                                         </p>
 
                                         <%if (service.type=="redirect" ){%>
 
                                             <a href="/services/<%=service.serviceRoute%>/enable"
-                                                class="btn btn-primary">Edit
-                                                <%=service.name%>
+                                                class="btn btn-primary m-1">Edit
+                                                
                                             </a>
                                             <button id="/services/<%=service.serviceRoute%>/disable"
-                                                class="btn btn-danger disable_service"> Disable
-                                                <%=service.name%>
+                                                class="btn btn-danger disable_service m-1"> Disable
+                                                
                                             </button>
                                             <% } else if (service.type=="toggle" ){ %>
                                                 <button id="/services/<%=service.serviceRoute%>/toggle"
                                                     class="btn btn-danger toggle_service"> Disable
-                                                    <%=service.name%>
+                                                
                                                 </button>
                                                 <%}%>
 
@@ -98,7 +95,7 @@
 
                 <hr>
 
-                <h3> Available Services: </h3>
+                <h3 class="row justify-content-md-center mt-4"> Available Services: </h3>
 
                 <div class="disabledServices">
 
@@ -113,15 +110,15 @@
 
                         <%}%>
                             <div class="col col-lg-2">
-                                <div class="card bg-info" style="max-width: 18rem;">
+                                <div class="card bg-info my-3" style="max-width: 18rem;">
 
-                                    <div class="card-body">
+                                    <div class="card-body text-center">
                                         <h5 class="card-title">
                                             <%=service.name%>
                                         </h5>
 
                                         <%if (service.type=="redirect" ){%>
-                                            <p class="card-text">
+                                            <p class="card-text text-left">
                                                 <%=service.description%>
                                             </p>
                                             <a href="/services/<%=service.serviceRoute%>/enable"

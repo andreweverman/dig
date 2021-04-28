@@ -14,6 +14,7 @@ import refresh from './services/refresh'
 import DigService from './services/DigService'
 import DugService from './services/DugService'
 import CatalogService from './services/CatalogService'
+import { serviceRunner } from './services/Service'
 import AlbumSaveTracksService from './services/AlbumSaveTracksService'
 // < - - - - - - SERVER SETUP - - - - - - >
 
@@ -46,7 +47,6 @@ app.use(
         },
     })
 )
-
 
 app.set('views', path.resolve('./views'))
 app.set('view engine', 'ejs')
@@ -81,11 +81,15 @@ function setupSchedules() {
     refresh()
     schedule.scheduleJob('*/20 * * * *', refresh)
 
-    new DigService().runService()
+    let digService = new DigService()
+    digService.runService(serviceRunner(DigService))
 
-    new DugService().runService()
+    let dugService = new DugService()
+    dugService.runService(serviceRunner(DugService))
 
-    new CatalogService().runService()
+    let catalogService = new DugService()
+    catalogService.runService(serviceRunner(CatalogService))
 
-    new AlbumSaveTracksService().runService()
+    let albumSaveTracksService = new AlbumSaveTracksService()
+    albumSaveTracksService.runService(serviceRunner(AlbumSaveTracksService))
 }

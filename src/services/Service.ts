@@ -3,6 +3,7 @@ import { Model, ObjectId, Document } from 'mongoose'
 import { User } from '../db/controllers/userController'
 import { IAlbumSaveTracksDoc } from '../db/models/AlbumSaveTrackss'
 import { IDigDoc } from '../db/models/Digs'
+import Users, { IUserDoc } from '../db/models/Users'
 export enum ServiceType {
     redirect = 'redirect',
     toggle = 'toggle',
@@ -11,68 +12,113 @@ export enum ServiceType {
 abstract class Service {
     abstract name: string
     abstract description: string
+    abstract extendedDescription: string
     abstract type: ServiceType
     abstract serviceRoute?: string
     abstract databaseCollection: string
     abstract databaseModel: Model<any, {}>
     abstract runSchedule: string | string[]
-    abstract selectPlaylistOnly: boolean
-    runService(): void {
+    abstract selectPlaylist: boolean
+    abstract extraConfig: boolean
+    abstract extraConfigPath: string
+
+    runService(func: any): void {
         if (Array.isArray(this.runSchedule)) {
             this.runSchedule.forEach((scheddy) => {
-                scheduleJob(scheddy, this.service)
+                scheduleJob(scheddy, func)
             })
         } else {
-            scheduleJob(this.runSchedule, this.service)
+            scheduleJob(this.runSchedule, func)
         }
     }
-
-    abstract service(): void
 
     abstract findOrCreate(userID: ObjectId, ...args: any[]): Promise<any>
 
     abstract getFromUserID(userID: ObjectId): Promise<any>
 
-    abstract removeService(userID: ObjectId): Promise<void>
+    abstract removeService(userID: ObjectId, serviceID: ObjectId): Promise<void>
 
-    protected async getFromUserIDTemplate<T>(userID: ObjectId): Promise<T> {
+    protected async getFromUserIDTemplate<T>(userID: ObjectId): Promise<T | null> {
         let doc = await this.databaseModel.findOne({ userID: userID }).exec()
         if (doc) return doc
-        throw 'Not found'
+        return null
     }
     protected findOrCreateTemplate<T>(model: Model<any, {}>, matcher: Promise<T>, createOptions: any) {
         return new Promise<T>((resolve, reject) => {
             matcher
                 .then((x: any) => {
-                    resolve(x)
+                    if (!x) {
+                        model
+                            .create(createOptions)
+                            .then((user: T) => {
+                                resolve(user)
+                            })
+                            .catch((err) => {
+                                reject(err)
+                            })
+                    } else {
+                        resolve(x)
+                    }
                 })
-                .catch(() => {
-                    model
-                        .create(createOptions)
-                        .then((user: T) => {
-                            resolve(user)
-                        })
-                        .catch((err) => {
-                            reject(err)
-                        })
+                .catch((err) => {
+                    throw err
                 })
         })
     }
 
-    protected removeServiceTemplate<T>(model: Model<any, {}>, userID: ObjectId, serviceName: string) {
-        model
-            .deleteOne({ userID: userID })
+    protected removeServiceTemplate(userID: ObjectId, serviceID: ObjectId) {
+        this.deleteServiceByUserID(userID)
             .exec()
             .then(() => {
-                User.removeServiceFromUser(serviceName, userID).catch((err) => console.error(err))
+                User.removeServiceFromUser(serviceID, userID).catch((err) => console.error(err))
             })
             .catch((err) => {
                 console.log(err)
             })
     }
 
-    async addServiceToUser(userID: ObjectId) {
-        User.addServiceToUser(this.name, userID)
+    async addServiceToUser(userID: ObjectId, serviceID: ObjectId) {
+        User.addServiceToUser(this.name, serviceID, userID)
+    }
+
+    deleteServiceByUserID(userID: ObjectId) {
+        return this.databaseModel.deleteOne({ userID: userID })
+    }
+
+    protected async matchUserToService(service: any) {
+        let user = await Users.findById(service.userID).exec()
+        if (user == null) {
+            User.removeAllUserTraces(service.userID)
+            throw 'User is no more'
+        }
+        return user
+    }
+
+    private async getAllDocs() {
+        return this.databaseModel.find().exec()
+    }
+
+    abstract runServiceForUser(serviceDoc: any, userID: IUserDoc)
+
+    async service() {
+        let service = await this.getAllDocs()
+        service.forEach((service) => {
+            this.matchUserToService(service)
+                .then((user) => {
+                    this.runServiceForUser(service, user)
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+            // goes to the catch if the user gets deleted. going to log elsewhere so nothing needs to be done there
+        })
+    }
+}
+
+export function serviceRunner(serviceClass: any) {
+    return () => {
+        let service = new serviceClass()
+        service.service()
     }
 }
 

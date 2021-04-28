@@ -1,100 +1,48 @@
-// submitting dig. extra check for if there is something selected
-$('#submit_existing_playlist').on('click',
-    function () {
-        let serviceRoute = $("#service_route").data('val')
-        let val = $(".existing_playlists").find('.list-group-item-success')        
-        let playlistID = val[0].value
-        if (playlistID != "") {
-            $.ajax({
-                url: `/services/${serviceRoute}/enable/existing_playlist`,
-                type: 'PUT',
-                data: { playlistID: playlistID },
-                success: function (response) {
-                    console.log("Success putting")
-                    let goTo ='/'
-                    if (response.goTo!=undefined) {
-                        goTo = response.goTo
-                    }
-                    window.location.href = goTo
-
-                },
-                error: function (request, msg, error) {
-                    console.log("Error putting", error);
-                    window.location.href = "/";
-                }
-            });
-
-        }
-    }
-
-);
-
-// submitting dig. extra check for if there is something selected
-$('#create_playlist_submit').on('click',
-    function () {
-
-        let newPlaylistName = $("#create_playlist_text").val();
-
-        if (newPlaylistName != "") {
-
-            $.ajax({
-                url: '/services/catalog/enable/new_playlist',
-                type: 'PUT',
-                data: { newPlaylistName: newPlaylistName },
-                success: function (response) {
-                    console.log("Success putting")
-                    window.location.href = "/";
-                }
-                ,
-                error: function (request, msg, error) {
-                    console.log("Error putting", error);
-                    window.location.href = "/";
-                }
-            });
-
-
-        }
-    }
-
-);
-
-$('.playlist_item').on('click', function () {
-
-    let findPrimary = $(this.parentElement).find('.list-group-item-success');
-    if (findPrimary.length != 0) {
-        for (let i = 0; i < findPrimary.length; i++) {
-            $(findPrimary[i]).removeClass("list-group-item-succecss")
-            $(findPrimary[i]).addClass("list-group-item-dark")
-        }
-
-    }
-
-    if ($(this).hasClass("list-group-item-dark")) {
-        $(this).removeClass("list-group-item-dark")
-        $(this).addClass("list-group-item-success")
-    }
-
-    $('#submit_existing_playlist').prop('disabled', false)
-
+// initial setup for the radio
+$(document).on('ready',function () {
+    $('#inlineRadio1').trigger("click")
 });
 
+// if radio is in existing mode
+$("#inlineRadio1").on("click", function () {
+    $("#existingPlaylist").show();
+    $("#existingSelect").prop('required', true);
 
+    $("#newPlaylist").hide();
+    $("#newInput").removeAttr("required");
+});
 
-// disabling of button if no text
-$("#create_playlist_text").on('change', function () {
+// if radio is in new mode
+$("#inlineRadio2").on("click", function () {
+    $("#existingPlaylist").hide();
+    $("#existingSelect").removeAttr("required");
 
-    let enabled = !($("#create_playlist_submit").prop("disabled"));
-    let empty = ($(this).val() == '');
-
-    $("#create_playlist_submit").prop("disabled", enabled && empty);
+    $("#newPlaylist").show();
+    $("#newInput").prop('required', true);
 
 
 });
 
 
-// disabling of button if no text. can get around without this
-$("#create_playlist_submit").on('mouseenter', function check() {
-    let empty = ($("#create_playlist_text").val() == '');
-    $(this).prop("disabled", empty);
-});
+// does the validation work
+(function () {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+
 

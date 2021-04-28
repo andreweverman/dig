@@ -18,8 +18,9 @@ router.put('/toggle', ensureAuthenticated, function (req, res) {
         albumSaveTracksDoc
             .save()
             .then(() => {
-                if (!newStatus) user.services = user.services.filter((s) => s != albumSaveTracksService.name)
-                else user.services.push(albumSaveTracksService.name)
+                if (!newStatus)
+                    user.services = user.services.filter((s) => s.serviceName != albumSaveTracksService.name)
+                else user.services.push({ serviceName: albumSaveTracksService.name, serviceID: albumSaveTracksDoc._id })
 
                 user.save()
                     .then(() => res.redirect(200, '/'))

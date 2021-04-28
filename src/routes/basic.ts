@@ -7,6 +7,7 @@ import DigService from '../services/DigService'
 import DugService from '../services/DugService'
 import CatalogService from '../services/CatalogService'
 import AlbumSaveTracksService from '../services/AlbumSaveTracksService'
+import _ from 'lodash'
 const passport = passportSP.passport
 
 let dig = new DigService()
@@ -18,13 +19,15 @@ let allServices = [dig, dug, catalog, albumSaveTracks]
 
 router.get('/', function (req, res) {
     let user = req.user as IUserDoc | undefined
-
+    
     if (!user) {
         let serviceDescriptions = allServices.map((s) => `${s.name}: ${s.description}`)
         res.render('basic/index.ejs', { user: req.user, serviceDescriptions: serviceDescriptions })
     } else {
-        let disabledServices = allServices.filter((service) => !user!.services.some((s) => s == service.name))
-        let enabledServices = allServices.filter((service) => user!.services.some((s) => s == service.name))
+
+        let [enabledServices,disabledServices]  = _.partition(allServices, (s) => user.services.some((us) => us.serviceName==s.name))
+        // let disabledServices = allServices.filter((service) => !user!.services.some((s) => s.serviceName == service.name))
+        // let enabledServices = allServices.filter((service) => user!.services.some((s) => s.serviceName == service.name))
 
         res.render('basic/index.ejs', {
             user: req.user,

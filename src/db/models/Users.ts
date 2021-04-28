@@ -1,4 +1,10 @@
-import mongoose, { Schema, Document } from 'mongoose'
+import mongoose, { Schema, Document, ObjectId } from 'mongoose'
+
+export interface IServiceObj {
+    serviceName: string
+    serviceID?: ObjectId
+}
+export interface IServiceObjDoc extends IServiceObj, Document {}
 
 export interface IUser {
     userID: string
@@ -7,7 +13,7 @@ export interface IUser {
     photo: string
     accessToken: string
     refreshToken: string
-    services: string[]
+    services: IServiceObj[]
 }
 
 export interface IUserDoc extends IUser, Document {}

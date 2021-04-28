@@ -4,6 +4,7 @@ export interface IDig {
     userID: ObjectId
     playlistID: string
     lastRun: Date
+    running: boolean
     daysToKeep: number
     minSongs: number
     albumSort: boolean
@@ -16,7 +17,14 @@ const DigSchema = new Schema({
     lastRun: { type: Date, required: true, default: new Date('1998-07-12T16:00:00Z') },
     daysToKeep: { type: Number, required: true, default: 7 },
     minSongs: { type: Number, required: true, default: 20 },
-    albumSort: { type: Boolean, required: true, default: false },
+    albumSort: { type: Boolean, default: false },
+    running: { type: Boolean, default: false },
+})
+DigSchema.pre<IDigDoc>('save', function (next) {
+    if (this.isModified('playlistID')) {
+        this.lastRun = new Date('1998-07-12T16:00:00Z')
+    }
+    next()
 })
 
 export default mongoose.model<IDigDoc>('Digs', DigSchema)
