@@ -39,8 +39,7 @@ class Catalog extends Service {
     }
 
     async existingPlaylist(user: IUserDoc, playlistID: string) {
-        let spotifyAPI = getAPIWithConfig()
-        spotifyAPI.setAccessToken(user.accessToken)
+        let spotifyAPI = getAPIWithConfig(user.accessToken)
 
         // set the variables in mongoose for the dig
         let discoverWeeklyPlaylistID = await getDiscoverWeeklyID(spotifyAPI, user.userID)

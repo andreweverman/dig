@@ -7,6 +7,8 @@ import spotifyWebApi from 'spotify-web-api-node'
 import { spotifyConfig } from '../../config/config'
 import { getUserOwnedPlaylists } from '../../utils/SpotifyUtil'
 import { IDig } from '../../db/models/Digs'
+import validationMiddleware from '../../middlewares/validationMiddleware'
+import { DigConfig } from '../../dtos/dig.dto'
 
 const router = Router()
 const digService = new DigService()
@@ -29,29 +31,33 @@ router.get('/enable', ensureAuthenticated, async (req, res) => {
     res.render('partials/serviceEnable.ejs', params)
 })
 
-router.post('/enable', ensureAuthenticated, async (req: Request, res: Response) => {
-    try {
-        let user = req.user as IUserDoc
-        // set the variables in mongoose for the dug
-        let params = {
-            minSongs: req.body.minSongs,
-            albumSort: req.body.albumSort == 'on',
-            daysToKeep: req.body.daysToKeep,
-        } as IDig
-        if (req.body.inlineRadioOptions == 'existingPlaylist') {
-            params.playlistID = req.body.playlistID
-            await digService.existingPlaylist(user, params)
-        } else if (req.body.inlineRadioOptions == 'newPlaylist') {
-            await digService.newPlaylist(user, req.body.newPlaylistName, params)
-        }
+router.post(
+    '/enable',
+    [ensureAuthenticated, validationMiddleware(DigConfig, 'body')],
+    async (req: Request, res: Response) => {
+        try {
+            let user = req.user as IUserDoc
+            // set the variables in mongoose for the dug
+            let params = {
+                minSongs: req.body.minSongs,
+                albumSort: req.body.albumSort == 'on',
+                daysToKeep: req.body.daysToKeep,
+            } as IDig
+            if (req.body.playlistRadio == 'existingPlaylist') {
+                params.playlistID = req.body.playlistID
+                await digService.existingPlaylist(user, params)
+            } else if (req.body.playlistRadio == 'newPlaylist') {
+                await digService.newPlaylist(user, req.body.newPlaylistName, params)
+            }
 
-        // editing new user
-        res.redirect('/')
-    } catch (error) {
-        console.error(error)
-        res.redirect(500, '/')
+            // editing new user
+            res.redirect('/')
+        } catch (error) {
+            console.error(error)
+            res.redirect(500, '/')
+        }
     }
-})
+)
 
 router.delete('/disable', ensureAuthenticated, async (req, res) => {
     let user = req.user as IUserDoc

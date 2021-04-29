@@ -1,13 +1,13 @@
-import { IsString } from 'class-validator'
+import { IsString, IsNotEmpty } from 'class-validator'
 
-export class ExistingPlaylistDto {
+export class PlaylistDto {
+    @IsString()
+    @IsNotEmpty()
+    public playlistRadio: string
+
     @IsString()
     public playlistID: string
-}
 
-export class NewPlaylistDto {
     @IsString()
     public newPlaylistName: string
 }
-
-

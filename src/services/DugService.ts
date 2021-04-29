@@ -48,8 +48,7 @@ class Dug extends Service {
     }
 
     async newPlaylist(user: IUserDoc, playlistName: string) {
-        const spotifyAPI = getAPIWithConfig()
-        spotifyAPI.setAccessToken(user.accessToken)
+        const spotifyAPI = getAPIWithConfig(user.accessToken)
 
         let data = await spotifyAPI.createPlaylist(playlistName, {
             description: 'Automatically generated playlist of all saved tracks.',
@@ -74,8 +73,7 @@ class Dug extends Service {
             dug.running = true
             dug.save()
             const increment = 30
-            let spotifyAPI = getAPIWithConfig()
-            spotifyAPI.setAccessToken(user.accessToken)
+            let spotifyAPI = getAPIWithConfig(user.accessToken)
 
             let savedTracks = (await spotifyAPI.getMySavedTracks({ limit: increment })).body.items
 

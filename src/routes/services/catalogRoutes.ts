@@ -1,13 +1,12 @@
 import { Request, Router, Response } from 'express'
-import { User } from '../../db/controllers/userController'
 import { IUserDoc } from '../../db/models/Users'
 import CatalogService from '../../services/CatalogService'
 import { ensureAuthenticated } from '../../middlewares/passportSP'
 import validationMiddleware from '../../middlewares/validationMiddleware'
-import { ExistingPlaylistDto, NewPlaylistDto } from '../../dtos/playlist.dto'
+import { PlaylistDto } from '../../dtos/playlist.dto'
 import spotifyWebApi from 'spotify-web-api-node'
 import { spotifyConfig } from '../../config/config'
-import { getDiscoverWeeklyID, getUserOwnedPlaylists } from '../../utils/SpotifyUtil'
+import { getUserOwnedPlaylists } from '../../utils/SpotifyUtil'
 
 const router = Router()
 const catalogService = new CatalogService()
@@ -32,24 +31,27 @@ router.get('/enable', ensureAuthenticated, (req, res) => {
 })
 
 // handles the enabling of dig. only good input can get to this point
+router.post(
+    '/enable',
+    [ensureAuthenticated, validationMiddleware(PlaylistDto,'body')],
+    async (req: Request, res: Response) => {
+        try {
+            let user = req.user as IUserDoc
+            // set the variables in mongoose for the dug
 
-router.post('/enable', ensureAuthenticated, async (req: Request, res: Response) => {
-    try {
-        let user = req.user as IUserDoc
-        // set the variables in mongoose for the dug
+            if (req.body.playlistRadio == 'existingPlaylist') {
+                await catalogService.existingPlaylist(user, req.body.playlistID)
+            } else if (req.body.playlistRadio == 'newPlaylist') {
+                await catalogService.newPlaylist(user, req.body.newPlaylistName)
+            }
 
-        if (req.body.inlineRadioOptions == 'existingPlaylist') {
-            await catalogService.existingPlaylist(user, req.body.playlistID)
-        } else if (req.body.inlineRadioOptions == 'newPlaylist') {
-            await catalogService.newPlaylist(user, req.body.newPlaylistName)
+            res.redirect('/')
+        } catch (error) {
+            console.error(error)
+            res.redirect(500, '/')
         }
-
-        res.redirect('/')
-    } catch (error) {
-        console.error(error)
-        res.redirect(500, '/')
     }
-})
+)
 
 router.delete('/disable', ensureAuthenticated, async (req, res) => {
     try {

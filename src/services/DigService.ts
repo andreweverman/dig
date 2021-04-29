@@ -52,8 +52,7 @@ class Dig extends Service {
     }
 
     async newPlaylist(user: IUserDoc, playlistName: string, digParams: IDig) {
-        const spotifyAPI = getAPIWithConfig()
-        spotifyAPI.setAccessToken(user.accessToken)
+        const spotifyAPI = getAPIWithConfig(user.accessToken)
 
         let data = await spotifyAPI.createPlaylist(playlistName, {
             description: 'Automatically generated recently saved tracks.',
@@ -78,8 +77,7 @@ class Dig extends Service {
     async runServiceForUser(dig: IDigDoc, user: IUserDoc) {
         try {
             const increment = 30
-            let spotifyAPI = getAPIWithConfig()
-            spotifyAPI.setAccessToken(user.accessToken)
+            let spotifyAPI = getAPIWithConfig(user.acces)
 
             let savedTracks = (await spotifyAPI.getMySavedTracks({ limit: increment })).body.items
             let digTracks = await getFullDig()

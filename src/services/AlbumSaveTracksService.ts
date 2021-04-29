@@ -36,8 +36,7 @@ class AlbumSaveTracks extends Service {
     }
 
     async runServiceForUser(albumDoc: IAlbumSaveTracksDoc, user: IUserDoc) {
-        const spotifyAPI = getAPIWithConfig()
-        spotifyAPI.setAccessToken(user.accessToken)
+        const spotifyAPI = getAPIWithConfig(user.accessToken)
         let offset = 0
         const limit = 50
         let albumTracks: any[] = []

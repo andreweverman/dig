@@ -4,8 +4,10 @@ import { IUserDoc } from '../db/models/Users'
 import { spotifyConfig } from '../config/config'
 import moment from 'moment'
 
-export function getAPIWithConfig() {
-    return new spotifyWebAPI(spotifyConfig)
+export function getAPIWithConfig(accessToken?: string) {
+    let api = new spotifyWebAPI(spotifyConfig)
+    if (accessToken) api.setAccessToken(accessToken)
+    return api
 }
 
 export async function checkIfSavedFully(tracks: any[], spotifyAPI: spotifyWebAPI) {
