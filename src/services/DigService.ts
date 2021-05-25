@@ -77,7 +77,7 @@ class Dig extends Service {
     async runServiceForUser(dig: IDigDoc, user: IUserDoc) {
         try {
             const increment = 30
-            let spotifyAPI = getAPIWithConfig(user.acces)
+            let spotifyAPI = getAPIWithConfig(user.accessToken)
 
             let savedTracks = (await spotifyAPI.getMySavedTracks({ limit: increment })).body.items
             let digTracks = await getFullDig()

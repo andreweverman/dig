@@ -92,6 +92,9 @@ class Dug extends Service {
             }
         } catch (err) {
             console.error(err)
+            dug.running = false
+            dug.lastRun = new Date()
+            dug.save()
         }
     }
 }
