@@ -20,6 +20,7 @@ const DigSchema = new Schema({
     albumSort: { type: Boolean, default: false },
     running: { type: Boolean, default: false },
 })
+
 DigSchema.pre<IDigDoc>('save', function (next) {
     if (this.isModified('playlistID')) {
         this.lastRun = new Date('1998-07-12T16:00:00Z')

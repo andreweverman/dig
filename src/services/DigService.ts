@@ -3,8 +3,14 @@ import Digs, { IDig, IDigDoc } from '../db/models/Digs'
 import { IUserDoc } from '../db/models/Users'
 import { User } from '../db/controllers/userController'
 import { ObjectId } from 'mongoose'
-import { getAPIWithConfig, addNewTracksToPlaylist, removeTracksFromPlaylistFully, checkIfSavedFully } from '../utils/SpotifyUtil'
+import {
+    getAPIWithConfig,
+    addNewTracksToPlaylist,
+    removeTracksFromPlaylistFully,
+    checkIfSavedFully,
+} from '../utils/SpotifyUtil'
 import moment from 'moment'
+import { Logger } from '../db/controllers/loggerController'
 
 class Dig extends Service {
     name = 'Dig'
@@ -98,8 +104,12 @@ class Dig extends Service {
             async function removeUnsavedTracks() {
                 digTracks = await getFullDig()
                 if (digTracks.length > 0) {
-                    let removeTracks = await checkIfSavedFully(digTracks.map((x) => x.track), spotifyAPI)
-                    if (removeTracks.length > 0) await removeTracksFromPlaylistFully(dig.playlistID, removeTracks, spotifyAPI)
+                    let removeTracks = await checkIfSavedFully(
+                        digTracks.map((x) => x.track),
+                        spotifyAPI
+                    )
+                    if (removeTracks.length > 0)
+                        await removeTracksFromPlaylistFully(dig.playlistID, removeTracks, spotifyAPI)
                 }
             }
 
@@ -182,7 +192,11 @@ class Dig extends Service {
                 }
             }
         } catch (err) {
+            Logger.createLog(dig.userID, this.name, err.toString())
             console.error(err)
+            dig.running = false
+            dig.lastRun = new Date()
+            dig.save()
         }
     }
 }

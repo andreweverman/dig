@@ -4,6 +4,7 @@ import { ObjectId } from 'mongoose'
 import { IUserDoc } from '../db/models/Users'
 import { User } from '../db/controllers/userController'
 import { getAPIWithConfig, addNewTracksToPlaylist } from '../utils/SpotifyUtil'
+import { Logger } from '../db/controllers/loggerController'
 
 class Dug extends Service {
     name = 'Dug'
@@ -91,7 +92,7 @@ class Dug extends Service {
                 return dug.lastRun < new Date(savedTracks[0].added_at)
             }
         } catch (err) {
-            console.error(err)
+            Logger.createLog(dug.userID,this.name,err.toString())
             dug.running = false
             dug.lastRun = new Date()
             dug.save()
