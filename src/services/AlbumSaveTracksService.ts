@@ -3,6 +3,7 @@ import AlbumSaveTrackss, { IAlbumSaveTracksDoc } from '../db/models/AlbumSaveTra
 import { ObjectId } from 'mongoose'
 import { IUserDoc } from '../db/models/Users'
 import { checkIfSavedFully, getAPIWithConfig, saveTracksFully, delay } from '../utils/SpotifyUtil'
+import { BatchLogger } from '../db/controllers/batchLoggerController'
 
 class AlbumSaveTracks extends Service {
     name = 'Album Save Tracks'

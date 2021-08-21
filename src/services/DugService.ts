@@ -5,6 +5,7 @@ import { IUserDoc } from '../db/models/Users'
 import { User } from '../db/controllers/userController'
 import { getAPIWithConfig, addNewTracksToPlaylist } from '../utils/SpotifyUtil'
 import { Logger } from '../db/controllers/loggerController'
+import { BatchLogger } from '../db/controllers/batchLoggerController'
 
 class Dug extends Service {
     name = 'Dug'
@@ -92,7 +93,7 @@ class Dug extends Service {
                 return dug.lastRun < new Date(savedTracks[0].added_at)
             }
         } catch (err) {
-            Logger.createLog(dug.userID,this.name,err.toString())
+            Logger.createLog(dug.userID, this.name, err.toString())
             dug.running = false
             dug.lastRun = new Date()
             dug.save()

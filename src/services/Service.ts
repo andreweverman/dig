@@ -4,6 +4,7 @@ import { User } from '../db/controllers/userController'
 import { IAlbumSaveTracksDoc } from '../db/models/AlbumSaveTrackss'
 import { IDigDoc } from '../db/models/Digs'
 import Users, { IUserDoc } from '../db/models/Users'
+import { BatchLogger } from '../db/controllers/batchLoggerController'
 export enum ServiceType {
     redirect = 'redirect',
     toggle = 'toggle',
@@ -105,6 +106,7 @@ abstract class Service {
         service.forEach((service) => {
             this.matchUserToService(service)
                 .then((user) => {
+                    BatchLogger.createLog(this.name)
                     this.runServiceForUser(service, user)
                 })
                 .catch((err) => {

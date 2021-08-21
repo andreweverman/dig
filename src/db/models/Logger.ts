@@ -9,10 +9,10 @@ export interface ILogger {
 export interface ILoggerDoc extends ILogger, Document {}
 
 const LoggerSchema = new Schema({
-    userIDs: { type: mongoose.Schema.Types.ObjectId, index: true },
+    userID: { type: mongoose.Schema.Types.ObjectId, index: true },
     serviceName: { type: String, required: true },
-    time: { type: Date, required: true },
-    error: { type: String, required: true },
+    time: { type: Date, required: true, default: new Date()},
+    error: { type: String, required: true, default:""},
 })
 
 export default mongoose.model<ILoggerDoc>('logger', LoggerSchema)

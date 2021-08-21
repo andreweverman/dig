@@ -4,6 +4,7 @@ import { ObjectId } from 'mongoose'
 import Users, { IUserDoc } from '../db/models/Users'
 import { User } from '../db/controllers/userController'
 import { getAPIWithConfig, getDiscoverWeeklyID } from '../utils/SpotifyUtil'
+import { BatchLogger } from '../db/controllers/batchLoggerController'
 
 class Catalog extends Service {
     name = 'Catalog'

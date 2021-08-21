@@ -11,6 +11,7 @@ import {
 } from '../utils/SpotifyUtil'
 import moment from 'moment'
 import { Logger } from '../db/controllers/loggerController'
+import { BatchLogger } from '../db/controllers/batchLoggerController'
 
 class Dig extends Service {
     name = 'Dig'
