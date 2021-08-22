@@ -171,8 +171,8 @@ class Dig extends Service {
                                 albumTracks.push(checkTrack)
                             }
                         }
-                        albumTracks = albumTracks.sort((a, b) => (a.track.position < b.track.position ? 1 : 0))
-                        idealOrder = idealOrder.concat(albumTracks)
+                        const newOrder = albumTracks.sort((a, b) => (a.track.track_number < b.track.track_number ? -1 : 1))
+                        idealOrder = idealOrder.concat(newOrder)
                         trackAlbums.add(albumURI)
                     }
                 })
