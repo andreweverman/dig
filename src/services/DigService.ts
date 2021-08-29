@@ -11,7 +11,7 @@ import {
 } from '../utils/SpotifyUtil'
 import moment from 'moment'
 import { Logger } from '../db/controllers/loggerController'
-import { BatchLogger } from '../db/controllers/batchLoggerController'
+import { delay } from 'lodash'
 
 class Dig extends Service {
     name = 'Dig'
@@ -82,6 +82,7 @@ class Dig extends Service {
     }
 
     async runServiceForUser(dig: IDigDoc, user: IUserDoc) {
+        const delayz = this.delay
         try {
             const increment = 30
             let spotifyAPI = getAPIWithConfig(user.accessToken)
@@ -177,19 +178,19 @@ class Dig extends Service {
                     }
                 })
 
-                let i = 0
 
                 for (let idx = 0; idx < idealOrder.length; idx++) {
                     let track = idealOrder[idx]
                     let index = digTracks.indexOf(track)
-                    if (index != i && index > -1) {
-                        await spotifyAPI.reorderTracksInPlaylist(dig.playlistID, index, i, {
+                    if (index != idx && index > -1) {
+                        await spotifyAPI.reorderTracksInPlaylist(dig.playlistID, index, idx, {
                             range_length: 1,
                         })
-                        digTracks.splice(idx, 1)
-                        digTracks.splice(i, 0, track)
+                        await delayz(1000)
+                    
+                        digTracks.splice(index, 1)
+                        digTracks.splice(idx, 0, track)
                     }
-                    i += 1
                 }
             }
         } catch (err) {

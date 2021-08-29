@@ -115,6 +115,10 @@ abstract class Service {
             // goes to the catch if the user gets deleted. going to log elsewhere so nothing needs to be done there
         })
     }
+
+    protected delay(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms))
+    }
 }
 
 export function serviceRunner(serviceClass: any) {
