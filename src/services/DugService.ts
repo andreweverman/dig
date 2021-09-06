@@ -93,7 +93,7 @@ class Dug extends Service {
                 return dug.lastRun < new Date(savedTracks[0].added_at)
             }
         } catch (err) {
-            Logger.createLog(dug.userID, this.name, err.toString())
+            Logger.createLog(dug.userID, this.name, err.toString(), err)
             dug.running = false
             dug.lastRun = new Date()
             dug.save()

@@ -97,7 +97,7 @@ class Dig extends Service {
                 })
             }
             await trimTracks()
-            await removeUnsavedTracks()
+            // await removeUnsavedTracks()
             if (dig.albumSort) albumSort()
 
             dig.lastRun = new Date()
@@ -194,7 +194,7 @@ class Dig extends Service {
                 }
             }
         } catch (err) {
-            Logger.createLog(dig.userID, this.name, err.toString())
+            Logger.createLog(dig.userID, this.name, err.toString(),err)
             console.error(err)
             dig.running = false
             dig.lastRun = new Date()
