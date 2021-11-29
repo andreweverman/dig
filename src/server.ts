@@ -74,7 +74,9 @@ app.use('/services/catalog', catalogRoutes)
 
 // \ - - - - - -  EDN MY ROUTES - - - - - - /
 
-app.listen(process.env.PORT, process.env.IP as any)
+if (process.env.RUN_WEB_SERVER) {
+    app.listen(process.env.PORT, process.env.IP as any)
+}
 
 function setupSchedules() {
     // run refresh tokens every 30
@@ -83,10 +85,11 @@ function setupSchedules() {
 
     let digService = new DigService()
     digService.runService(serviceRunner(DigService))
-    // digService.service()
+    digService.service()
 
     let dugService = new DugService()
     dugService.runService(serviceRunner(DugService))
+    dugService.service()
 
     let catalogService = new DugService()
     catalogService.runService(serviceRunner(CatalogService))
