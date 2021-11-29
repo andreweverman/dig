@@ -3,9 +3,11 @@ import { Response, Request } from 'express'
 import { IUserDoc } from '../db/models/Users'
 import { spotifyConfig } from '../config/config'
 import moment from 'moment'
+import SpotifyWebApi from 'spotify-web-api-node'
 
 export function getAPIWithConfig(accessToken?: string) {
-    let api = new spotifyWebAPI(spotifyConfig)
+    const api = new SpotifyWebApi()
+    // let api = new spotifyWebAPI(spotifyConfig)
     if (accessToken) api.setAccessToken(accessToken)
     return api
 }
