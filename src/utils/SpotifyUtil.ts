@@ -76,7 +76,7 @@ export async function addNewTracksToPlaylist(
     lastRun: Date,
     spotifyAPI: spotifyWebAPI,
     options: addSongsOptions
-) {
+):Promise<boolean> {
     try {
         let breakOut = false
         let increment = 30
@@ -128,7 +128,7 @@ export async function addNewTracksToPlaylist(
             }
         } while (true)
     } catch (err) {
-        console.error(err)
+        return false
     }
 }
 

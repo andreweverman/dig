@@ -90,11 +90,15 @@ class Dig extends Service {
             let savedTracks = (await spotifyAPI.getMySavedTracks({ limit: increment })).body.items
             let digTracks = await getFullDig()
 
+            Logger.createLog(dig.userID, this.name, 'About to check if I should add tracks to dig...', {})
             if (checkIfAdd()) {
-                await addNewTracksToPlaylist(dig.playlistID, dig.lastRun, spotifyAPI, {
+                let ranSuccessfully = await addNewTracksToPlaylist(dig.playlistID, dig.lastRun, spotifyAPI, {
                     addIfEmpty: true,
                     daysToKeep: dig.daysToKeep,
                 })
+                if (!ranSuccessfully){
+                    return
+                }
             }
             await trimTracks()
             // await removeUnsavedTracks()
