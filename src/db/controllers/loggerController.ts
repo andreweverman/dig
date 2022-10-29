@@ -5,10 +5,10 @@ export namespace Logger {
     export function createLog(
         userID: ObjectId,
         serviceName: string,
-        error: string,
-        errorObj: any
+        message: string,
+        errorObj={}
     ): Promise<ILoggerDoc> {
         const time = new Date()
-        return Loggers.create({ userID, serviceName, error, time, errorObj })
+        return Loggers.create({ userID, serviceName, message, time, errorObj})
     }
 }

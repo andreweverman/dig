@@ -4,7 +4,8 @@ export interface ILogger {
     userID: ObjectId
     serviceName: string
     time: Date
-    error: string
+    message: string
+    errorObj: Object
 }
 export interface ILoggerDoc extends ILogger, Document {}
 
@@ -12,7 +13,7 @@ const LoggerSchema = new Schema({
     userID: { type: mongoose.Schema.Types.ObjectId, index: true },
     serviceName: { type: String, required: true },
     time: { type: Date, required: true, default: new Date() },
-    error: { type: String, required: true, default: '' },
+    message: { type: String, required: false, default: '' },
     errorObj: { type: Object, required: true, default: {} },
 })
 
