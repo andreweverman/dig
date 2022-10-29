@@ -130,6 +130,7 @@ export async function addNewTracksToPlaylist(
     } catch (err) {
         return false
     }
+    return true
 }
 
 export function delay(ms: number) {
