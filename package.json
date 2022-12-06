@@ -41,7 +41,7 @@
     "mongoose-findorcreate": "^3.0.0",
     "nocache": "^2.1.0",
     "node-schedule": "^2.0.0",
-    "passport": "^0.4.1",
+    "passport": "^0.6.0",
     "passport-spotify": "^2.0.0",
     "qs": "^6.10.3",
     "spotify-web-api-js": "^1.5.1",
