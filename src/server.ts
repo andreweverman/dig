@@ -85,10 +85,10 @@ function setupSchedules() {
 
     let digService = new DigService()
     digService.runService(serviceRunner(DigService))
+    digService.service()
 
     let dugService = new DugService()
     dugService.runService(serviceRunner(DugService))
-    dugService.service()
 
     let catalogService = new DugService()
     catalogService.runService(serviceRunner(CatalogService))
