@@ -71,6 +71,7 @@ class Dug extends Service {
 
     async runServiceForUser(dug: IDugDoc, user: IUserDoc) {
         try {
+            Logger.createLog(dug.userID, this.name,`Starting dug `)
             if (dug.running) return
             dug.running = true
             dug.save()
@@ -79,7 +80,10 @@ class Dug extends Service {
 
             let savedTracks = (await spotifyAPI.getMySavedTracks({ limit: increment })).body.items
 
+
             if (checkIfAdd()) {
+
+                Logger.createLog(dug.userID, this.name,`Going to add tracks for dug`)
                 await addNewTracksToPlaylist(dug.playlistID, dug.lastRun, spotifyAPI, {
                     addIfEmpty: true,
                 })
@@ -88,6 +92,8 @@ class Dug extends Service {
             dug.running = false
             dug.lastRun = new Date()
             dug.save()
+            
+            Logger.createLog(dug.userID, this.name,'Dug finished successfully')
 
             function checkIfAdd(): boolean {
                 return dug.lastRun < new Date(savedTracks[0].added_at)

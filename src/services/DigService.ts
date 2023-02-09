@@ -104,7 +104,7 @@ class Dig extends Service {
             // await removeUnsavedTracks()
             if (dig.albumSort) albumSort()
 
-            dig.lastRun = new Date()
+            dig.lastRun = moment.utc().toDate()
             dig.save()
 
             async function removeUnsavedTracks() {
@@ -135,7 +135,7 @@ class Dig extends Service {
             }
 
             function checkIfAdd(): boolean {
-                return dig.lastRun < new Date(savedTracks[0].added_at) || digTracks.length == 0
+                return moment(dig.lastRun) < moment(savedTracks[0].added_at) || digTracks.length == 0
             }
 
             async function trimTracks() {
@@ -201,7 +201,7 @@ class Dig extends Service {
             Logger.createLog(dig.userID, this.name, err.toString(),err)
             console.error(err)
             dig.running = false
-            dig.lastRun = new Date()
+            dig.lastRun = moment.utc().toDate()
             dig.save()
         }
     }

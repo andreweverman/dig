@@ -2,7 +2,7 @@ import spotifyWebAPI from 'spotify-web-api-node'
 import { Response, Request } from 'express'
 import { IUserDoc } from '../db/models/Users'
 import { spotifyConfig } from '../config/config'
-import moment from 'moment'
+import moment , {Moment} from 'moment'
 import SpotifyWebApi from 'spotify-web-api-node'
 
 export function getAPIWithConfig(accessToken?: string) {
@@ -73,7 +73,7 @@ export interface addSongsOptions {
 }
 export async function addNewTracksToPlaylist(
     playlistID: string,
-    lastRun: Date,
+    lastRun: Moment | Date,
     spotifyAPI: spotifyWebAPI,
     options: addSongsOptions
 ):Promise<boolean> {

@@ -1,3 +1,4 @@
+import moment, { Moment } from 'moment'
 import mongoose, { Schema, Document, ObjectId } from 'mongoose'
 
 export interface IDig {
@@ -23,7 +24,7 @@ const DigSchema = new Schema({
 
 DigSchema.pre<IDigDoc>('save', function (next) {
     if (this.isModified('playlistID')) {
-        this.lastRun = new Date('1998-07-12T16:00:00Z')
+        this.lastRun = moment.utc().toDate()
     }
     next()
 })
