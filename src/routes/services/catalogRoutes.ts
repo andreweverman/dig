@@ -9,7 +9,7 @@ import { spotifyConfig } from '../../config/config'
 import { getUserOwnedPlaylists } from '../../utils/SpotifyUtil'
 
 const router = Router()
-const catalogService = new CatalogService()
+const catalogService = CatalogService.getInstance()
 
 router.get('/enable', ensureAuthenticated, (req, res) => {
     try {

@@ -11,7 +11,7 @@ import validationMiddleware from '../../middlewares/validationMiddleware'
 import { DigConfig } from '../../dtos/dig.dto'
 
 const router = Router()
-const digService = new DigService()
+const digService = DigService.getInstance()
 
 router.get('/enable', ensureAuthenticated, async (req, res) => {
     let spotifyAPI = new spotifyWebApi(spotifyConfig)

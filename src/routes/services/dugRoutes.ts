@@ -10,7 +10,7 @@ import validationMiddleware from '../../middlewares/validationMiddleware'
 import { PlaylistDto } from '../../dtos/playlist.dto'
 
 const router = Router()
-const dugService = new DugService()
+const dugService = DugService.getInstance()
 
 router.get('/enable', ensureAuthenticated, async (req, res) => {
     let spotifyAPI = new spotifyWebApi(spotifyConfig)

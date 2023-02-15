@@ -14,8 +14,14 @@ import refresh from './services/refresh'
 import DigService from './services/DigService'
 import DugService from './services/DugService'
 import CatalogService from './services/CatalogService'
-import { serviceRunner } from './services/Service'
-import AlbumSaveTracksService from './services/AlbumSaveTracksService'
+
+export enum Queues {
+    dig = 'dig',
+    dug = 'dug',
+    catalog = 'catalog',
+}
+
+
 // < - - - - - - SERVER SETUP - - - - - - >
 
 // connecting to the mongodb server
@@ -63,13 +69,12 @@ app.use('/public', express.static(path.resolve('./public')))
 import basicRoute from './routes/basic'
 app.use('/', basicRoute)
 
-import albumSaveTracksRoutes from './routes/services/albumSaveTracksRoutes'
-app.use('/services/album_save_tracks', albumSaveTracksRoutes)
 import dugRoutes from './routes/services/dugRoutes'
 app.use('/services/dug', dugRoutes)
 import digRoutes from './routes/services/digRoutes'
 app.use('/services/dig', digRoutes)
 import catalogRoutes from './routes/services/catalogRoutes'
+import { consumeServiceQueueMessages } from './utils/Consumer'
 app.use('/services/catalog', catalogRoutes)
 
 // \ - - - - - -  EDN MY ROUTES - - - - - - /
@@ -83,16 +88,16 @@ function setupSchedules() {
     refresh()
     schedule.scheduleJob('*/20 * * * *', refresh)
 
-    let digService = new DigService()
-    digService.runService(serviceRunner(DigService))
-    digService.service()
+    let digService = DigService.getInstance()
+    digService.runService()
+    digService.queueService()
 
-    let dugService = new DugService()
-    dugService.runService(serviceRunner(DugService))
+    // let dugService = new DugService()
+    // dugService.runService(serviceRunner(DugService))
 
-    let catalogService = new DugService()
-    catalogService.runService(serviceRunner(CatalogService))
+    // let catalogService = new DugService()
+    // catalogService.runService(serviceRunner(CatalogService))
 
-    let albumSaveTracksService = new AlbumSaveTracksService()
-    albumSaveTracksService.runService(serviceRunner(AlbumSaveTracksService))
+    consumeServiceQueueMessages()
 }
+

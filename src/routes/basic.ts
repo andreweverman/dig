@@ -6,16 +6,14 @@ import { IUserDoc } from '../db/models/Users'
 import DigService from '../services/DigService'
 import DugService from '../services/DugService'
 import CatalogService from '../services/CatalogService'
-import AlbumSaveTracksService from '../services/AlbumSaveTracksService'
 import _ from 'lodash'
 const passport = passportSP.passport
 
-let dig = new DigService()
-let dug = new DugService()
-let catalog = new CatalogService()
-let albumSaveTracks = new AlbumSaveTracksService()
+let dig = DigService.getInstance()
+let dug = DugService.getInstance()
+let catalog = CatalogService.getInstance()
 
-let allServices = [dig, dug, catalog, albumSaveTracks]
+let allServices = [dig, dug, catalog]
 
 router.get('/', function (req, res) {
     let user = req.user as IUserDoc | undefined
@@ -26,8 +24,6 @@ router.get('/', function (req, res) {
     } else {
 
         let [enabledServices,disabledServices]  = _.partition(allServices, (s) => user.services.some((us) => us.serviceName==s.name))
-        // let disabledServices = allServices.filter((service) => !user!.services.some((s) => s.serviceName == service.name))
-        // let enabledServices = allServices.filter((service) => user!.services.some((s) => s.serviceName == service.name))
 
         res.render('basic/index.ejs', {
             user: req.user,

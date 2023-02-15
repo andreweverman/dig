@@ -3,13 +3,11 @@ import { ObjectId } from 'mongoose'
 import DigService from '../../services/DigService'
 import DugService from '../../services/DugService'
 import CatalogService from '../../services/CatalogService'
-import AlbumSaveTracksService from '../../services/AlbumSaveTracksService'
 
-let dig = new DigService()
-let dug = new DugService()
-let catalog = new CatalogService()
-let albumSaveTracks = new AlbumSaveTracksService()
-let allServices = [dig, dug, catalog, albumSaveTracks]
+let dig = DigService.getInstance()
+let dug = DugService.getInstance()
+let catalog = CatalogService.getInstance()
+let allServices = [dig, dug, catalog]
 
 export namespace User {
     export function getAllUsers() {

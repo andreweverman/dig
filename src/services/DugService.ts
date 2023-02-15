@@ -6,6 +6,7 @@ import { User } from '../db/controllers/userController'
 import { getAPIWithConfig, addNewTracksToPlaylist } from '../utils/SpotifyUtil'
 import { Logger } from '../db/controllers/loggerController'
 import { BatchLogger } from '../db/controllers/batchLoggerController'
+import { Queues, ServiceMessage } from '../utils/enums'
 
 class Dug extends Service {
     name = 'Dug'
@@ -15,13 +16,35 @@ class Dug extends Service {
     serviceRoute = 'dug'
     databaseCollection = 'dug'
     databaseModel = Dugs
+    queueName = Queues.dug
     runSchedule = '*/5 * * * *'
     selectPlaylist = true
     extraConfig = false
     extraConfigPath = ''
+    private static instance: Dug;
 
-    constructor() {
-        super()
+
+    /**
+     * The Singleton's constructor should always be private to prevent direct
+     * construction calls with the `new` operator.
+     */
+    private constructor() { super() }
+
+    /**
+     * The static method that controls the access to the singleton instance.
+     *
+     * This implementation let you subclass the Singleton class while keeping
+     * just one instance of each subclass around.
+     */
+    public static getInstance(): any {
+        if (!Dug.instance) {
+            Dug.instance = new Dug();
+        }
+
+        return Dug.instance;
+    }
+    runService() {
+        this.runServiceClass(Dug)
     }
 
     async getFromUserID(userID: ObjectId): Promise<IDugDoc | null> {
@@ -69,41 +92,42 @@ class Dug extends Service {
         await User.addServiceToUser(this.name, dug._id, user._id)
     }
 
-    async runServiceForUser(dug: IDugDoc, user: IUserDoc) {
-        try {
-            Logger.createLog(dug.userID, this.name,`Starting dug `)
-            if (dug.running) return
-            dug.running = true
-            dug.save()
-            const increment = 30
-            let spotifyAPI = getAPIWithConfig(user.accessToken)
+    async service(serviceMessage: ServiceMessage) {
+        //     try {
+        //         Logger.createLog(dug.userID, this.name,`Starting dug `)
+        //         if (dug.running) return
+        //         dug.running = true
+        //         dug.save()
+        //         const increment = 30
+        //         let spotifyAPI = getAPIWithConfig(user.accessToken)
 
-            let savedTracks = (await spotifyAPI.getMySavedTracks({ limit: increment })).body.items
+        //         let savedTracks = (await spotifyAPI.getMySavedTracks({ limit: increment })).body.items
 
 
-            if (checkIfAdd()) {
+        //         if (checkIfAdd()) {
 
-                Logger.createLog(dug.userID, this.name,`Going to add tracks for dug`)
-                await addNewTracksToPlaylist(dug.playlistID, dug.lastRun, spotifyAPI, {
-                    addIfEmpty: true,
-                })
-            }
+        //             Logger.createLog(dug.userID, this.name,`Going to add tracks for dug`)
+        //             await addNewTracksToPlaylist(dug.playlistID, dug.lastRun, spotifyAPI, {
+        //                 addIfEmpty: true,
+        //             })
+        //         }
 
-            dug.running = false
-            dug.lastRun = new Date()
-            dug.save()
-            
-            Logger.createLog(dug.userID, this.name,'Dug finished successfully')
+        //         dug.running = false
+        //         dug.lastRun = new Date()
+        //         dug.save()
 
-            function checkIfAdd(): boolean {
-                return dug.lastRun < new Date(savedTracks[0].added_at)
-            }
-        } catch (err) {
-            Logger.createLog(dug.userID, this.name, err.toString(), err)
-            dug.running = false
-            dug.lastRun = new Date()
-            dug.save()
-        }
+        //         Logger.createLog(dug.userID, this.name,'Dug finished successfully')
+
+        //         function checkIfAdd(): boolean {
+        //             return dug.lastRun < new Date(savedTracks[0].added_at)
+        //         }
+        //     } catch (err) {
+        //         Logger.createLog(dug.userID, this.name, err.toString(), err)
+        //         dug.running = false
+        //         dug.lastRun = new Date()
+        //         dug.save()
+        //     }
+        // }
     }
 }
 

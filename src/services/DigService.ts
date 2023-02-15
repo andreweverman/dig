@@ -4,30 +4,53 @@ import { IUserDoc } from '../db/models/Users'
 import { User } from '../db/controllers/userController'
 import { ObjectId } from 'mongoose'
 import {
-    getAPIWithConfig,
     addNewTracksToPlaylist,
-    removeTracksFromPlaylistFully,
+    getAPIWithConfig,
     checkIfSavedFully,
+    removeTracksFromPlaylistFully,
+
 } from '../utils/SpotifyUtil'
 import moment from 'moment'
-import { Logger } from '../db/controllers/loggerController'
-import { delay } from 'lodash'
+
+import { Queues, ServiceMessage } from '../utils/enums'
 
 class Dig extends Service {
+    private static instance: Dig;
     name = 'Dig'
     description = 'A constantly updated playlist of your most recently saved tracks'
     extendedDescription = `"Dig" takes the recently most saved tracks and making a small playlist of just those tracks. It automatically keeps updated in the background so you don't have to think about it.`
     type = ServiceType.redirect
     serviceRoute = 'dig'
     databaseCollection = 'dig'
+    queueName = Queues.dig
     databaseModel = Digs
-    runSchedule = '*/5 * * * *'
+    runSchedule = '*/1 * * * *'
     selectPlaylist = true
     extraConfig = true
     extraConfigPath = '../services/dig/config.ejs'
 
-    constructor() {
-        super()
+    /**
+     * The Singleton's constructor should always be private to prevent direct
+     * construction calls with the `new` operator.
+     */
+    private constructor() { super() }
+
+    /**
+     * The static method that controls the access to the singleton instance.
+     *
+     * This implementation let you subclass the Singleton class while keeping
+     * just one instance of each subclass around.
+     */
+    public static getInstance(): any {
+        if (!Dig.instance) {
+            Dig.instance = new Dig();
+        }
+
+        return Dig.instance;
+    }
+
+    runService() {
+        this.runServiceClass(Dig)
     }
 
     async getFromUserID(userID: ObjectId): Promise<IDigDoc | null> {
@@ -40,6 +63,8 @@ class Dig extends Service {
             playlistID: playlistID,
         })
     }
+
+
 
     async removeService(userID: ObjectId, serviceID: ObjectId) {
         return this.removeServiceTemplate(userID, serviceID)
@@ -81,8 +106,11 @@ class Dig extends Service {
         await User.addServiceToUser(this.name, dig._id, user._id)
     }
 
-    async runServiceForUser(dig: IDigDoc, user: IUserDoc) {
-        const delayz = this.delay
+
+    async service(serviceMessage: ServiceMessage) {
+        console.log('Running Dig.  .  .')
+        const dig: IDigDoc = await this.findService(serviceMessage.serviceId)
+        const user = await this.matchUserToService(dig)
         try {
             const increment = 30
             let spotifyAPI = getAPIWithConfig(user.accessToken)
@@ -90,13 +118,12 @@ class Dig extends Service {
             let savedTracks = (await spotifyAPI.getMySavedTracks({ limit: increment })).body.items
             let digTracks = await getFullDig()
 
-            Logger.createLog(dig.userID, this.name, 'About to check if I should add tracks to dig...', {})
             if (checkIfAdd()) {
                 let ranSuccessfully = await addNewTracksToPlaylist(dig.playlistID, dig.lastRun, spotifyAPI, {
                     addIfEmpty: true,
                     daysToKeep: dig.daysToKeep,
                 })
-                if (!ranSuccessfully){
+                if (!ranSuccessfully) {
                     return
                 }
             }
@@ -190,15 +217,15 @@ class Dig extends Service {
                         await spotifyAPI.reorderTracksInPlaylist(dig.playlistID, index, idx, {
                             range_length: 1,
                         })
-                        await delayz(1000)
-                    
+                        await this.delay(1000)
+
                         digTracks.splice(index, 1)
                         digTracks.splice(idx, 0, track)
                     }
                 }
             }
         } catch (err) {
-            Logger.createLog(dig.userID, this.name, err.toString(),err)
+            // Logger.createLog(dig.userID, this.name, err.toString(), err)
             console.error(err)
             dig.running = false
             dig.lastRun = moment.utc().toDate()

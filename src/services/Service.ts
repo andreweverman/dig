@@ -1,10 +1,9 @@
 import { scheduleJob } from 'node-schedule'
-import { Model, ObjectId, Document } from 'mongoose'
+import { Model, ObjectId } from 'mongoose'
 import { User } from '../db/controllers/userController'
-import { IAlbumSaveTracksDoc } from '../db/models/AlbumSaveTrackss'
-import { IDigDoc } from '../db/models/Digs'
-import Users, { IUserDoc } from '../db/models/Users'
-import { BatchLogger } from '../db/controllers/batchLoggerController'
+import Users from '../db/models/Users'
+import { publishToQueue } from '../utils/QueueUtil'
+import { Queues, ServiceMessage } from '../utils/enums'
 export enum ServiceType {
     redirect = 'redirect',
     toggle = 'toggle',
@@ -18,18 +17,23 @@ abstract class Service {
     abstract serviceRoute?: string
     abstract databaseCollection: string
     abstract databaseModel: Model<any, {}>
+    abstract queueName: Queues
     abstract runSchedule: string | string[]
     abstract selectPlaylist: boolean
     abstract extraConfig: boolean
     abstract extraConfigPath: string
 
-    runService(func: any): void {
+
+    abstract runService(): void
+
+    runServiceClass(singletonClass: any): void {
         if (Array.isArray(this.runSchedule)) {
             this.runSchedule.forEach((scheddy) => {
-                scheduleJob(scheddy, func)
+
+                scheduleJob(scheddy, serviceRunner(singletonClass))
             })
         } else {
-            scheduleJob(this.runSchedule, func)
+            scheduleJob(this.runSchedule, serviceRunner(singletonClass))
         }
     }
 
@@ -67,6 +71,12 @@ abstract class Service {
         })
     }
 
+    protected async findService<T>(serviceId: string) {
+        let doc = await this.databaseModel.findOne({ _id: serviceId }).exec()
+        if (doc) return doc
+        return null
+    }
+
     protected removeServiceTemplate(userID: ObjectId, serviceID: ObjectId) {
         this.deleteServiceByUserID(userID)
             .exec()
@@ -95,25 +105,19 @@ abstract class Service {
         return user
     }
 
-    private async getAllDocs() {
-        return this.databaseModel.find().exec()
+    protected async getAllDocs() {
+        return this.databaseModel.find({}, { _id: 1 }).exec()
     }
 
-    abstract runServiceForUser(serviceDoc: any, userID: IUserDoc)
+    abstract service(serviceMessage: ServiceMessage)
 
-    async service() {
-        let service = await this.getAllDocs()
-        service.forEach((service) => {
-            this.matchUserToService(service)
-                .then((user) => {
-                    BatchLogger.createLog(this.name)
-                    this.runServiceForUser(service, user)
-                })
-                .catch((err) => {
-                    console.error(err)
-                })
-            // goes to the catch if the user gets deleted. going to log elsewhere so nothing needs to be done there
+    async queueService() {
+        const docs = await this.getAllDocs()
+
+        docs.forEach((doc) => {
+            publishToQueue(this.queueName, doc._id)
         })
+
     }
 
     protected delay(ms: number) {
@@ -121,10 +125,10 @@ abstract class Service {
     }
 }
 
-export function serviceRunner(serviceClass: any) {
+function serviceRunner(serviceClass: any) {
     return () => {
         let service = new serviceClass()
-        service.service()
+        service.queueService()
     }
 }
 

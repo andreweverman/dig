@@ -5,6 +5,7 @@ import Users, { IUserDoc } from '../db/models/Users'
 import { User } from '../db/controllers/userController'
 import { getAPIWithConfig, getDiscoverWeeklyID } from '../utils/SpotifyUtil'
 import { BatchLogger } from '../db/controllers/batchLoggerController'
+import { Queues, ServiceMessage } from '../utils/enums'
 
 class Catalog extends Service {
     name = 'Catalog'
@@ -14,13 +15,38 @@ class Catalog extends Service {
     serviceRoute = 'catalog'
     databaseCollection = 'catalog'
     databaseModel = Catalogs
+    queueName = Queues.catalog
     runSchedule = ['0 12 * * *']
     selectPlaylist = true
     extraConfig = false
     extraConfigPath = ''
 
-    constructor() {
-        super()
+    private static instance: Catalog;
+
+
+    /**
+     * The Singleton's constructor should always be private to prevent direct
+     * construction calls with the `new` operator.
+     */
+    private constructor() { super() }
+
+    /**
+     * The static method that controls the access to the singleton instance.
+     *
+     * This implementation let you subclass the Singleton class while keeping
+     * just one instance of each subclass around.
+     */
+    public static getInstance(): any {
+        if (!Catalog.instance) {
+            Catalog.instance = new Catalog();
+        }
+
+        return Catalog.instance;
+    }
+
+
+    runService() {
+        this.runServiceClass(Catalog)
     }
 
     async getFromUserID(userID: ObjectId): Promise<ICatalogDoc | null> {
@@ -80,21 +106,21 @@ class Catalog extends Service {
         await this.addServiceToUser(user._id, catalog._id)
     }
 
-    async runServiceForUser(catalog: ICatalogDoc, user: IUserDoc) {
-        let spotifyAPI = getAPIWithConfig()
-        spotifyAPI.setAccessToken(user.accessToken)
+    async service(serviceMessage: ServiceMessage) {
+        // let spotifyAPI = getAPIWithConfig()
+        // spotifyAPI.setAccessToken(user.accessToken)
 
-        let dwPlaylist = await spotifyAPI.getPlaylistTracks(catalog.discoverWeeklyPlaylistID)
-        let maxDateTrack = dwPlaylist.body.items.reduce((min, x) => (x.added_at > min.added_at ? x : min))
-        let maxDateInPlaylist = new Date(maxDateTrack.added_at)
-        if (maxDateInPlaylist > catalog.lastAddedDate) {
-            // need to add the songs
-            let tracks = dwPlaylist.body.items.map((x) => x.track.uri)
-            spotifyAPI.addTracksToPlaylist(catalog.catalogPlaylistID, tracks).then(() => {
-                catalog.lastAddedDate = maxDateInPlaylist
-                catalog.save()
-            })
-        }
+        // let dwPlaylist = await spotifyAPI.getPlaylistTracks(catalog.discoverWeeklyPlaylistID)
+        // let maxDateTrack = dwPlaylist.body.items.reduce((min, x) => (x.added_at > min.added_at ? x : min))
+        // let maxDateInPlaylist = new Date(maxDateTrack.added_at)
+        // if (maxDateInPlaylist > catalog.lastAddedDate) {
+        //     // need to add the songs
+        //     let tracks = dwPlaylist.body.items.map((x) => x.track.uri)
+        //     spotifyAPI.addTracksToPlaylist(catalog.catalogPlaylistID, tracks).then(() => {
+        //         catalog.lastAddedDate = maxDateInPlaylist
+        //         catalog.save()
+        //     })
+        // }
     }
 }
 
